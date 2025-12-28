@@ -1,0 +1,367 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   DESIGN TOKENS — Autotrader Pro+++
+============================================================ */
+:root{
+  --bg-1: #05060f;
+  --bg-2: #0a0f1f;
+  --bg-3: #111522;
+
+  --card: #131827;
+  --card-2: #161c2e;
+
+  --border: rgba(255,255,255,0.06);
+
+  --muted: #9aa0c8;
+  --muted-2: #b7bee5;
+
+  --accent: #5363ff;
+  --accent-2: #7c89ff;
+  --accent-soft: rgba(83,99,255,0.08);
+
+  --success: #22c55e;
+  --danger: #ef4444;
+
+  --radius-base: 14px;
+  --radius-card: 18px;
+}
+
+
+/* ============================================================
+   GLOBAL BASE STYLING
+============================================================ */
+html, body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system;
+  background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  -webkit-font-smoothing: antialiased;
+  color: #fff;
+  scroll-behavior: smooth;
+}
+
+.text-muted { color: var(--muted); }
+.text-muted-2 { color: var(--muted-2); }
+
+a { transition: color .18s ease, opacity .18s ease; }
+a:hover { opacity: .82; }
+
+:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(83,99,255,0.15);
+  border-radius: .5rem;
+}
+
+
+/* ============================================================
+   CARDS — Premium Depth
+============================================================ */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  transition: background .25s ease, border .25s ease, transform .2s ease;
+}
+
+.card:hover {
+  background: var(--card-2);
+  transform: translateY(-2px);
+}
+
+.card:active {
+  transform: translateY(0px) scale(.98);
+}
+
+
+/* ============================================================
+   HERO
+============================================================ */
+.hero-max {
+  max-width: 1000px;
+}
+
+
+/* ============================================================
+   MARQUEE (Ticker AutoTrader)
+============================================================ */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 22s linear infinite;
+}
+
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-base);
+  padding: .7rem 1.2rem;
+  font-weight: 600;
+  transition: background .25s ease, transform .22s ease;
+}
+
+.btn-primary:hover { background: var(--accent-2); }
+.btn-primary:active { transform: scale(.96); }
+
+.btn-soft {
+  background: var(--accent-soft);
+  color: var(--accent-2);
+  border-radius: var(--radius-base);
+  padding: .65rem 1.1rem;
+  font-weight: 500;
+}
+
+.btn-soft:hover { background: rgba(83,99,255,0.14); }
+
+.btn-premium:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 24px rgba(83,99,255,0.55);
+}
+
+
+/* ============================================================
+   SHADOWS & LIFT EFFECTS
+============================================================ */
+.soft-shadow { box-shadow: 0 6px 22px rgba(3,6,23,0.6); }
+.soft-shadow-lg { box-shadow: 0 14px 40px rgba(3,6,23,0.55); }
+
+.card-hover:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.38);
+  border-color: rgba(255,255,255,0.08);
+}
+
+.card-hover-sm:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.32);
+}
+
+.card-hover-glow:hover {
+  transform: translateY(-4px) scale(1.017);
+  box-shadow: 0 0 32px rgba(83,99,255,0.32);
+}
+
+.icon-float:hover {
+  transform: translateY(-3px) scale(1.08);
+}
+
+
+/* ============================================================
+   ANIMATIONS & INTERACTIONS
+============================================================ */
+* {
+  transition:
+    background-color .25s ease,
+    border-color .25s ease,
+    transform .28s cubic-bezier(.22,.61,.36,1),
+    box-shadow .28s cubic-bezier(.22,.61,.36,1);
+}
+
+/* GPU boost */
+.interactive {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+
+/* ============================================================
+   BADGES / DIVIDERS
+============================================================ */
+.badge {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: .35rem .6rem;
+  border-radius: .5rem;
+  font-size: .75rem;
+  font-weight: 500;
+}
+
+.divider {
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+
+/* ============================================================
+   SECTION SPACING & CONTAINER
+============================================================ */
+.section { padding: 88px 0; }
+@media (max-width: 768px){
+  .section { padding: 50px 0; }
+}
+
+.container-xl {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.2rem;
+}
+
+
+/* ============================================================
+   TYPOGRAPHY POLISH
+============================================================ */
+h1 {
+  font-size: 2.45rem;
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.95rem;
+  font-weight: 700;
+  line-height: 1.22;
+}
+
+h3 { font-size: 1.45rem; font-weight: 600; }
+h4 { font-size: 1.15rem; font-weight: 600; }
+
+p { line-height: 1.58; }
+.text-sm { line-height: 1.45; }
+
+.hero-title-spacing > * + * { margin-top: 14px; }
+.card > * + * { margin-top: 14px; }
+
+.label {
+  font-size: .78rem;
+  color: var(--muted);
+  letter-spacing: .015em;
+}
+
+.icon-inline {
+  vertical-align: -2px;
+  margin-right: 6px;
+}
+
+
+/* ============================================================
+   TWEAK 11 — NEON DIVIDER + SCANLINE
+============================================================ */
+@keyframes scanline {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.neon-divider {
+  position: relative;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  margin: 60px 0;
+}
+
+.neon-divider::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  height: 6px;
+  background: linear-gradient(90deg, transparent, rgba(83,99,255,0.45), transparent);
+  filter: blur(6px);
+}
+
+.neon-divider::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.07) 0%,
+    rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0.07) 100%
+  );
+  animation: scanline 3.5s linear infinite;
+  opacity: .25;
+}
+
+
+/* ============================================================
+   SPARKLINE (mini charts)
+============================================================ */
+.sparkline polyline {
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+@keyframes scanFlicker {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.28; }
+  100% { opacity: 0.2; }
+}
+
+@keyframes particleFloat {
+  0% { transform: translateY(0px); opacity: 0.6; }
+  50% { transform: translateY(-4px); opacity: 1; }
+  100% { transform: translateY(0px); opacity: 0.6; }
+}
+
+@keyframes boltFlash {
+  0% { opacity: 0; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0; }
+}
+
+@keyframes pulse2 {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.45; }
+  100% { opacity: 0.2; }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fadeInUp {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
