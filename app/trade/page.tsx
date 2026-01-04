@@ -9,7 +9,6 @@ import { trackEvent } from "@/lib/events";
 import {
   getFunnelState,
   subscribeFunnel,
-  initFunnelClient,
 } from "@/lib/events";
 
 import { BROKERS, BrokerKey } from "@/lib/brokers";
