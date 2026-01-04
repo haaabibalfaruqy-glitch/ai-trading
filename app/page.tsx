@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation"; // <-- import useRouter
+import Link from "next/link";
+import { trackEvent } from "@/lib/events";
 
+export const dynamic = "force-dynamic";
 export default function HomePageUltraCleanProMaxMobile() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const router = useRouter(); // <-- inisialisasi router
 
   // ================= PARTICLE EFFECT =================
   useEffect(() => {
@@ -86,8 +87,7 @@ export default function HomePageUltraCleanProMaxMobile() {
       <div className="absolute top-[-80px] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-r from-[#22ff88]/20 via-[#3cffaa]/10 to-[#22ff88]/10 rounded-full blur-[140px] animate-pulse pointer-events-none"></div>
       <div className="absolute bottom-[-120px] right-1/3 w-[400px] h-[200px] bg-gradient-to-t from-[#22ff88]/15 to-transparent rounded-full blur-[100px] animate-fadeIn pointer-events-none"></div>
 
-      {/* ================= HERO ================= */}
-      <section className="pt-24 pb-24 container mx-auto text-center relative z-10 px-4">
+      <section className="pt-20 pb-20 container mx-auto text-center relative z-10 px-4">
         <h1 className="text-[36px] sm:text-[50px] md:text-[68px] font-extrabold leading-[1.1] mb-4 tracking-tight">
           <span className="block text-gray-100 animate-fadeInUp delay-200">AI Trading Advisor</span>
           <span className="block text-[#22ff88] animate-fadeInUp delay-400">
@@ -100,33 +100,128 @@ export default function HomePageUltraCleanProMaxMobile() {
         </p>
 
         {/* ================= BUTTON NAVIGATE TO TRADE ================= */}
-        <button
-          onClick={() => router.push("/trade")} // <-- navigasi ke trade page
-          className="px-10 sm:px-16 py-3 sm:py-4 font-bold rounded-3xl bg-gradient-to-r from-[#22ff88] to-[#3cffaa] text-black shadow-[0_15px_45px_rgba(34,255,136,0.35)] hover:scale-105 active:scale-95 transition-all animate-fadeInUp delay-800 relative overflow-hidden"
-        >
-          Start Optimizing →
-          <span className="absolute top-0 left-0 w-full h-full bg-white/10 opacity-0 hover:opacity-30 transition-all rounded-3xl pointer-events-none"></span>
-        </button>
+<Link
+  href="/trade"
+  prefetch={false}
+  onClick={() => {
+    trackEvent("cta_click", {
+      tier: "soft",
+      source: "hero",
+    });
+  }}
+  className="
+    inline-flex items-center justify-center
+    px-8 py-4 rounded-xl
+    bg-[#22ff88]
+    text-black font-semibold
+    hover:scale-105 transition
+    relative z-50
+  "
+>
+  Start Optimizing →
+</Link>
+
+<p className="mt-3 text-xs text-gray-400">
+  Configure your AI preferences before connecting any execution account.
+</p>
 
         {/* SUBTLE DIVIDER */}
         <div className="mt-8 w-20 sm:w-28 h-[2px] bg-[#22ff88]/30 mx-auto rounded-full animate-fadeInUp delay-1000"></div>
 
         {/* MICRO-TRUST STATS */}
-        <div className="mt-6 flex flex-wrap justify-center gap-4 sm:gap-6 text-[10px] sm:text-[12px] text-gray-400 animate-fadeInUp delay-1200">
-          <div className="flex flex-col items-center">
-            <span className="text-white font-semibold">12,500+</span>
-            <span>Active Traders</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-white font-semibold">287</span>
-            <span>Strategies Running</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-white font-semibold">97.8%</span>
-            <span>Uptime</span>
-          </div>
-        </div>
+<div className="mt-6 flex flex-wrap justify-center gap-4 sm:gap-6 text-[10px] sm:text-[12px] text-gray-400">
+  <div className="flex flex-col items-center">
+    <span className="text-white font-semibold">12,500+</span>
+    <span>Active Traders</span>
+  </div>
+  <div className="flex flex-col items-center">
+    <span className="text-white font-semibold">287</span>
+    <span>Strategies Running</span>
+  </div>
+  <div className="flex flex-col items-center">
+    <span className="text-white font-semibold">97.8%</span>
+    <span>Uptime</span>
+  </div>
+</div>
+
+<p className="mt-4 text-[11px] text-gray-500 max-w-md mx-auto">
+  Metrics reflect platform activity across live usage, simulations, and strategy testing environments.
+</p>
       </section>
+
+      {/* ================= HOW THE AI WORKS ================= */}
+      <section className="container mx-auto px-4 mt-28 relative z-10">
+  <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10">
+    How Our AI Supports Smarter Trading Decisions
+  </h2>
+
+  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 text-sm text-gray-300">
+    <div className="p-6 rounded-xl bg-white/5 backdrop-blur border border-white/10">
+      <h3 className="text-[#22ff88] font-semibold mb-2">Market Data Analysis</h3>
+      <p>
+        Continuously analyzes multi-source market data to identify relevant price behavior and structural conditions.
+      </p>
+    </div>
+
+    <div className="p-6 rounded-xl bg-white/5 backdrop-blur border border-white/10">
+      <h3 className="text-[#22ff88] font-semibold mb-2">Signal Filtering</h3>
+      <p>
+        Filters raw signals using probabilistic models to reduce noise and avoid overreaction to short-term fluctuations.
+      </p>
+    </div>
+
+    <div className="p-6 rounded-xl bg-white/5 backdrop-blur border border-white/10">
+      <h3 className="text-[#22ff88] font-semibold mb-2">Risk & Volatility Control</h3>
+      <p>
+        Evaluates recommendations against dynamic risk parameters and adapts to changing volatility regimes.
+      </p>
+    </div>
+
+    <div className="p-6 rounded-xl bg-white/5 backdrop-blur border border-white/10">
+      <h3 className="text-[#22ff88] font-semibold mb-2">Execution Insights</h3>
+      <p>
+        Provides clear, data-backed execution guidance — execution remains optional and user-controlled.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section className="container mx-auto px-4 mt-24 relative z-10 text-center">
+  <h2 className="text-2xl sm:text-3xl font-bold mb-6">
+    Designed for Traders Who Value Data, Not Hype
+  </h2>
+
+  <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-300">
+    <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10">
+      Active Traders
+    </span>
+    <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10">
+      Data-Driven Decision Makers
+    </span>
+    <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10">
+      Traders Using External Brokers
+    </span>
+    <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10">
+      Risk-Conscious Strategies
+    </span>
+  </div>
+
+  <p className="mt-6 text-gray-400 text-sm max-w-xl mx-auto">
+    This platform is built as a decision-support layer — not a shortcut to profits.
+  </p>
+</section>
+
+<section className="container mx-auto px-4 mt-20 relative z-10">
+  <div className="max-w-3xl mx-auto p-6 rounded-xl bg-[#22ff88]/10 border border-[#22ff88]/30 text-center">
+    <h3 className="text-lg font-semibold text-[#22ff88] mb-2">
+      You Stay in Control — Always
+    </h3>
+    <p className="text-sm text-gray-200">
+      You maintain full control over your capital, execution decisions, and risk exposure at all times.
+      The AI never places trades or moves funds without user confirmation.
+    </p>
+  </div>
+</section>
 
       {/* ================= ANIMATION CLASSES ================= */}
       <style jsx>{`
@@ -145,6 +240,12 @@ export default function HomePageUltraCleanProMaxMobile() {
         @keyframes fadeIn { 0%{opacity:0;}100%{opacity:1;} }
         .animate-fadeIn { animation: fadeIn 2s ease forwards; }
       `}</style>
+
+      <footer className="mt-32 w-full text-center text-[11px] text-gray-500 px-4 relative z-10">
+  This platform provides analytical insights and strategy recommendations only.
+  It does not manage user funds or provide investment advice.
+</footer>
+
     </div>
   );
 }

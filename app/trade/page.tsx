@@ -1,17 +1,20 @@
 "use client";
 
-const DEV_BYPASS =
-  process.env.NODE_ENV === "development";
-
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchMarketSeries } from "@/lib/market";
 import { useEffect, useState, useRef, useMemo } from "react";
-import { getFunnelState } from "@/lib/events";
 import { useRouter } from "next/navigation";
 import ExecutionGate from "@/components/ExecutionGate";
 import { trackEvent } from "@/lib/events";
+import {
+  getFunnelState,
+  subscribeFunnel,
+  initFunnelClient,
+} from "@/lib/events";
+
 import { BROKERS, BrokerKey } from "@/lib/brokers";
 import { generateMarketInsight } from "@/lib/insight";
+import { initFunnelClient } from "@/lib/events";
 import { buildShareText } from "@/lib/share";
 import {
   hasPremiumAccess,
@@ -19,6 +22,8 @@ import {
   getPremiumExpire,
 } from "@/lib/premium";
 import { MEMBERSHIP } from "@/lib/membership";
+
+const isBrowser = typeof window !== "undefined";
 
 
 const mapTrendToSignal = (
@@ -32,24 +37,17 @@ const DEFAULT_BROKER: BrokerKey = "binance";
 const EXECUTION_LIMIT = false;
 
 function redirectToBroker(broker: BrokerKey) {
+  if (typeof window === "undefined") return;
+
   const last = sessionStorage.getItem("lastAffiliateRedirect");
   const now = Date.now();
 
-const unlocked = sessionStorage.getItem("executionUnlocked") === "true";
-if (!unlocked) return;
+  const unlocked = sessionStorage.getItem("executionUnlocked") === "true";
+  if (!unlocked) return;
 
-  if (last && now - Number(last) < 1000 * 60 * 60 * 6) {
-    // anti spam 6 jam
-    return;
-  }
+  if (last && now - Number(last) < 1000 * 60 * 60 * 6) return;
 
   sessionStorage.setItem("lastAffiliateRedirect", String(now));
-
-trackEvent("affiliate_redirect", {
-  broker,
-  ts: Date.now(),
-});
-
   window.location.href = BROKERS[broker].affiliateUrl;
 }
 
@@ -108,7 +106,9 @@ const animateNumber = (
   duration: number,
   onUpdate: (v: number) => void
 ) => {
-  const start = performance.now();
+  const start = typeof performance !== "undefined"
+  ? performance.now()
+  : Date.now();
 
   const tick = (now: number) => {
     const progress = Math.min((now - start) / duration, 1);
@@ -813,38 +813,20 @@ function smoothSeries(
   return result;
 }
 
+
 export default function TradePage() {
   const router = useRouter();
-const [accessGranted, setAccessGranted] = useState(false);
 
-useEffect(() => {
-  // 🔓 DEV MODE: BYPASS SEMUA FUNNEL
-  if (DEV_BYPASS) {
-    setAccessGranted(true);
-    return;
-  }
+  const [setAccessGranted] = useState(false);
+  const [setReady] = useState(false);
 
   const unlocked =
-    sessionStorage.getItem("tradeUnlocked") === "true" &&
-    getFunnelState().clickedSoftCTA === true;
+    typeof window !== "undefined" &&
+    localStorage.getItem("tradeUnlocked") === "true";
 
-  if (unlocked) {
-    setAccessGranted(true);
-    return;
-  }
-
-  const funnel = getFunnelState();
-
-  if (!funnel.sawChart || !funnel.clickedSoftCTA) {
-    router.replace("/");
-    return;
-  }
-
-  sessionStorage.setItem("tradeUnlocked", "true");
-  sessionStorage.setItem("tradeUnlockedAt", String(Date.now()));
-
-  setAccessGranted(true);
-}, [router]);
+  // FIRST VISIT → AUTO UNLOCK
+  localStorage.setItem("tradeUnlocked", "true");
+  localStorage.setItem("tradeUnlockedAt", String(Date.now()));
 
   const coinList = useMemo(() => {
   return Array.from({ length: 200 }).map((_, i) => ({
@@ -877,6 +859,7 @@ const [risk, setRisk] = useState<"all" | "low" | "medium" | "high">("all");
 const [timeframe, setTimeframe] = useState<"all" | "scalp" | "long">("all");
 const [heroProfit, setHeroProfit] = useState(1284392);
 const [heartbeat, setHeartbeat] = useState(0);
+const [funnel, setFunnel] = useState(getFunnelState());
 const [resurrectedUser, setResurrectedUser] = useState(false);
 const [bigWin, setBigWin] = useState<string | null>(null);
 const [lastAction, setLastAction] = useState<string | null>(null);
@@ -884,13 +867,6 @@ const [realSeries, setRealSeries] = useState<number[] | null>(null);
 const [shareText, setShareText] = useState<string | null>(null);
 const [loadingRealData, setLoadingRealData] = useState(false);
 const [showExecutionGate, setShowExecutionGate] = useState(false);
-useEffect(() => {
-  if (process.env.NODE_ENV === "development") {
-    setShowExecutionGate(false); // DEV UNLOCK
-    sessionStorage.setItem("executionUnlocked", "true");
-  }
-}, []);
-
 const [viralInsight, setViralInsight] = useState<string | null>(null);
 const [showExitGuard, setShowExitGuard] = useState(false);
 const exitFiredRef = useRef(false);
@@ -938,6 +914,14 @@ useEffect(() => {
     clearInterval(id);
     intervalRegistry.delete(id);
   };
+}, []);
+
+useEffect(() => {
+  initFunnelClient(); // load dari sessionStorage (client only)
+
+  return subscribeFunnel(() => {
+    setFunnel(getFunnelState());
+  });
 }, []);
 
 useEffect(() => {
@@ -1033,7 +1017,6 @@ useEffect(() => {
 useEffect(() => {
   const handleMouseLeave = (e: MouseEvent) => {
     if (exitFiredRef.current) return;
-    if (!accessGranted) return;
     if (capitalMode === "Preservation") return;
 
     if (e.clientY <= 0) {
@@ -1057,7 +1040,7 @@ useEffect(() => {
     window.removeEventListener("mouseleave", handleMouseLeave);
     document.removeEventListener("visibilitychange", handleVisibility);
   };
-}, [accessGranted, capitalMode]);
+}, [capitalMode]);
 
 useEffect(() => {
   if (!observedCoin) return;
@@ -1411,10 +1394,9 @@ useEffect(() => {
     return () => clearTimeout(timer);
   }, []);
 
-  if (!accessGranted) {
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-[#05080f] text-gray-400 text-sm">
-      Verifying access…
+      Initializing system…
     </div>
   );
 }

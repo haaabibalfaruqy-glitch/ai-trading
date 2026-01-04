@@ -63,21 +63,14 @@ type EventPayload = {
 
 const eventQueue: EventPayload[] = [];
 
-
-let funnelState =
-  loadFunnel() || {
-    // STEP 1–2
-    sawChart: false,
-    clickedSoftCTA: false,
-
-    // STEP 3–4
-    gateViewed: false,
-    gateClicked: false,
-    executionUnlocked: false,
-
-    // STEP 4
-    redirectedToBroker: false,
-  };
+let funnelState = {
+  sawChart: false,
+  clickedSoftCTA: false,
+  gateViewed: false,
+  gateClicked: false,
+  executionUnlocked: false,
+  redirectedToBroker: false,
+};
 
 
 export function trackEvent(
