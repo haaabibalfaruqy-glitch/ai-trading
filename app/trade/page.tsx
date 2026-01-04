@@ -14,7 +14,6 @@ import {
 
 import { BROKERS, BrokerKey } from "@/lib/brokers";
 import { generateMarketInsight } from "@/lib/insight";
-import { initFunnelClient } from "@/lib/events";
 import { buildShareText } from "@/lib/share";
 import {
   hasPremiumAccess,
@@ -817,7 +816,7 @@ function smoothSeries(
 export default function TradePage() {
   const router = useRouter();
 
-  const [setAccessGranted] = useState(false);
+  const [accessGranted, setAccessGranted] = useState(false);
   const [setReady] = useState(false);
 
   const unlocked =
@@ -1393,13 +1392,6 @@ useEffect(() => {
 
     return () => clearTimeout(timer);
   }, []);
-
-  return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-[#05080f] text-gray-400 text-sm">
-      Initializing system…
-    </div>
-  );
-}
 
   return (
     <div
