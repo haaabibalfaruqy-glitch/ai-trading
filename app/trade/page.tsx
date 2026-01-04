@@ -915,8 +915,6 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  initFunnelClient(); // load dari sessionStorage (client only)
-
   return subscribeFunnel(() => {
     setFunnel(getFunnelState());
   });
