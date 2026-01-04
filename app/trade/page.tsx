@@ -818,13 +818,22 @@ export default function TradePage() {
   const [accessGranted, setAccessGranted] = useState(false);
   const [setReady] = useState(false);
 
-  const unlocked =
-    typeof window !== "undefined" &&
+const [unlocked, setUnlocked] = useState(false);
+
+useEffect(() => {
+  const isUnlocked =
     localStorage.getItem("tradeUnlocked") === "true";
 
-  // FIRST VISIT → AUTO UNLOCK
-  localStorage.setItem("tradeUnlocked", "true");
-  localStorage.setItem("tradeUnlockedAt", String(Date.now()));
+  if (!isUnlocked) {
+    localStorage.setItem("tradeUnlocked", "true");
+    localStorage.setItem(
+      "tradeUnlockedAt",
+      String(Date.now())
+    );
+  }
+
+  setUnlocked(true);
+}, []);
 
   const coinList = useMemo(() => {
   return Array.from({ length: 200 }).map((_, i) => ({
@@ -857,7 +866,6 @@ const [risk, setRisk] = useState<"all" | "low" | "medium" | "high">("all");
 const [timeframe, setTimeframe] = useState<"all" | "scalp" | "long">("all");
 const [heroProfit, setHeroProfit] = useState(1284392);
 const [heartbeat, setHeartbeat] = useState(0);
-const [funnel, setFunnel] = useState(getFunnelState());
 const [resurrectedUser, setResurrectedUser] = useState(false);
 const [bigWin, setBigWin] = useState<string | null>(null);
 const [lastAction, setLastAction] = useState<string | null>(null);
@@ -899,6 +907,12 @@ const percentChange =
         100
       ).toFixed(2)
     : null;
+
+const [funnel, setFunnel] = useState(null);
+
+useEffect(() => {
+  setFunnel(getFunnelState());
+}, []);
 
 useEffect(() => {
   const id = safeInterval(() => {
@@ -1138,11 +1152,13 @@ useEffect(() => {
   };
 }, []);
 
-const [slotsLeft, setSlotsLeft] = useState<number>(() => {
-  if (typeof window === "undefined") return 3;
+const [slotsLeft, setSlotsLeft] = useState(3);
+
+useEffect(() => {
   const saved = localStorage.getItem("premium_slots_left");
-  return saved ? Number(saved) : 3;
-});
+  if (saved) setSlotsLeft(Number(saved));
+}, []);
+
 
 // ================= MODE COPY =================
 const MODE_COPY = {
