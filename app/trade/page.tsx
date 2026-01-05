@@ -816,7 +816,7 @@ export default function TradePage() {
   const router = useRouter();
 
   const [accessGranted, setAccessGranted] = useState(false);
-  const [setReady] = useState(false);
+  const [ready, setReady] = useState(false);
 
 const [unlocked, setUnlocked] = useState(false);
 
@@ -835,19 +835,21 @@ useEffect(() => {
   setUnlocked(true);
 }, []);
 
-  const coinList = useMemo(() => {
-  return Array.from({ length: 200 }).map((_, i) => ({
-    name: `COIN-${i + 1}`,
-    short: `C${i + 1}`,
-    risk: (
-  i % 3 === 0
-    ? "low"
-    : i % 3 === 1
-    ? "medium"
-    : "high"
-) as "low" | "medium" | "high",
-    timeframe: i % 2 === 0 ? "scalp" : "long",
-  }));
+const coinList = useMemo(() => {
+  return Array.from({ length: 200 }).map((_, i) => {
+    return {
+      name: `COIN-${i + 1}`,
+      short: `C${i + 1}`,
+      risk: (
+        i % 3 === 0
+          ? "low"
+          : i % 3 === 1
+          ? "medium"
+          : "high"
+      ) as "low" | "medium" | "high",
+      timeframe: i % 2 === 0 ? "scalp" : "long",
+    };
+  });
 }, []);
 
   const initialData = useMemo(() => {
@@ -1513,6 +1515,7 @@ useEffect(() => {
     overflow-hidden
   "
 >
+
   {/* BACKGROUND GLOW */}
   <div
     className="
@@ -1745,69 +1748,56 @@ and transparent system state.
   </div>
 </div>
 
-<LiveProfitTable enabled={systemMode === "active"} />
 
-{/* ================= MODE SELECTOR ================= */}
-<div
-  className={`
-    bg-[#0B1220]
-    border
-    rounded-2xl
-    p-4
-    ${
-      activeRiskProfile.color === "emerald"
-        ? "border-[#22ff88]"
-        : activeRiskProfile.color === "yellow"
-        ? "border-[#facc15]"
-        : "border-[#ef4444]"
-    }
-  `}
->
+{hasPremiumAccess() && (
+  <div
+    className={`
+      bg-[#0B1220]
+      border
+      rounded-2xl
+      p-4
+      ${
+        activeRiskProfile.color === "emerald"
+          ? "border-[#22ff88]"
+          : activeRiskProfile.color === "yellow"
+          ? "border-[#facc15]"
+          : "border-[#ef4444]"
+      }
+    `}
+  >
+    <div className="text-[11px] text-gray-400 mb-3">
+      Override Capital Mode (Simulation)
+    </div>
 
-  <div className="text-[11px] text-gray-400 mb-3">
-    Override Capital Mode (Simulation)
+    <div className="flex gap-2">
+      {[
+        "Preservation",
+        "Adaptive Growth",
+        "Aggressive Expansion"
+      ].map((mode) => (
+        <button
+          key={mode}
+          onClick={() => {
+            setCapitalMode(mode as CapitalMode);
+            setRiskAppetite(
+              mode === "Preservation"
+                ? "Low"
+                : mode === "Aggressive Expansion"
+                ? "High"
+                : "Medium"
+            );
+          }}
+          className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold`}
+        >
+          {mode}
+        </button>
+      ))}
+    </div>
   </div>
+)}
 
-  <div className="flex gap-2">
-    {[
-      "Preservation",
-      "Adaptive Growth",
-      "Aggressive Expansion"
-    ].map((mode) => (
-      <button
-        key={mode}
-        onClick={() => {
-  setCapitalMode(mode as CapitalMode);
+    {/* ================= MODE DESCRIPTION ================= */}
 
-  setRiskAppetite(
-    mode === "Preservation"
-      ? "Low"
-      : mode === "Aggressive Expansion"
-      ? "High"
-      : "Medium"
-  );
-
-  setGovernanceEvents((e) => [
-    `Manual override → ${mode}`,
-    ...e.slice(0, 4)
-  ]);
-}}
-        className={`
-          px-3 py-1.5 rounded-lg text-[12px] font-semibold transition
-          ${
-            capitalMode === mode
-              ? "bg-[#22ff88] text-black"
-              : "bg-[#1E293B] text-gray-300 hover:bg-[#22ff8820]"
-          }
-        `}
-      >
-        {mode}
-      </button>
-    ))}
-  </div>
-</div>
-
-{/* ================= MODE DESCRIPTION ================= */}
 <div className="mt-4 max-w-xl text-sm">
   <div className="text-white font-semibold mb-1">
     {activeModeCopy.title}
@@ -1817,7 +1807,8 @@ and transparent system state.
   </p>
 </div>
 
-{/* ================= GOVERNANCE EVENT LOG ================= */}
+{/* CLEAN V1: governance event log hidden */}
+{false && (
 <div className="
   bg-[#0B0F18]
   border border-[#1F2937]
@@ -1839,6 +1830,7 @@ and transparent system state.
     ))}
   </div>
 </div>
+)}
 
   {/* ================= SYSTEM STATUS ================= */}
 <section className="card p-5">
@@ -1855,12 +1847,14 @@ and transparent system state.
   </div>
 </section>
 
-<SystemStatus systemMode={systemMode} />
+{/* CLEAN V1: hide system diagnostics */}
+{false && <SystemStatus systemMode={systemMode} />}
 
   {/* HERO VISUAL */}
-  <HeroVisual />
+{/* CLEAN V1: visual overload disabled */}
+{/* <HeroVisual /> */}
 </div>
-  </div>
+</div>
 </section>
 {/* ================= END HERO ================= */}
 {/* ================= ABSTRACTION LAYER ================= */}
@@ -2098,23 +2092,20 @@ and transparent system state.
       const active = activeFilter === label;
 
       return (
-        <button
-          key={label}
-          onClick={() => {
-  setActiveFilter(label);
+<button
+  key={label}
+  onClick={() => {
+    setActiveFilter(label);
 
-  // Filter risk
-  if (label === "Low Risk") setRisk("low");
-  else if (label === "Medium Risk") setRisk("medium");
-  else if (label === "High Risk") setRisk("high");
-  else setRisk("all");
+    if (label === "Low Risk") setRisk("low");
+    else if (label === "Medium Risk") setRisk("medium");
+    else if (label === "High Risk") setRisk("high");
+    else setRisk("all");
 
-  // Filter timeframe
-  if (label === "Scalping") setTimeframe("scalp");
-  else if (label === "Long Term") setTimeframe("long");
-  else setTimeframe("all");
-}}
-
+    if (label === "Scalping") setTimeframe("scalp");
+    else if (label === "Long Term") setTimeframe("long");
+    else setTimeframe("all");
+  }}
 
           className={`
   relative px-5 py-2 rounded-full text-[13px] font-semibold
@@ -2435,14 +2426,14 @@ trackEvent("insight_shared", {
               key={num}
               onClick={() => setPage(num)}
               className={`
-                w-9 h-9 flex items-center justify-center rounded-full text-[14px]
-                transition
-                ${active
-                  ? "bg-[#22ff88] text-black font-semibold"
-                  : "bg-[#1E293B] text-gray-300 hover:bg-[#22ff8820]"
-                  +  "shadow-[inset_0_1px_0_#ffffff12]"
-                }
-              `}
+  w-9 h-9 flex items-center justify-center rounded-full text-[14px]
+  transition
+  shadow-[inset_0_1px_0_#ffffff12]
+  ${active
+    ? "bg-[#22ff88] text-black font-semibold"
+    : "bg-[#1E293B] text-gray-300 hover:bg-[#22ff8820]"
+  }
+`}
             >
               {num}
             </button>
@@ -2492,33 +2483,33 @@ trackEvent("insight_shared", {
   </div>
 )}
 
-{showExecutionGate && (
-  <ExecutionGate
-    onConnect={() => {
-      trackEvent("execution_gate_click", {
-        source: "trade_page",
-      });
+        {showExecutionGate && (
+          <ExecutionGate
+            onConnect={() => {
+              trackEvent("execution_gate_click", {
+                source: "trade_page",
+              });
 
-      const viralSent = sessionStorage.getItem("viralInsightSent");
-      if (!viralSent) {
-        trackEvent("viral_insight_generated", {
-          context: "execution_gate",
-          symbol: observedCoin?.coin.short ?? "unknown",
-        });
+              const viralSent = sessionStorage.getItem("viralInsightSent");
+              if (!viralSent) {
+                trackEvent("viral_insight_generated", {
+                  context: "execution_gate",
+                  symbol: observedCoin?.coin.short ?? "unknown",
+                });
 
-        sessionStorage.setItem("viralInsightSent", "true");
-      }
+                sessionStorage.setItem("viralInsightSent", "true");
+              }
 
-      redirectToBroker(DEFAULT_BROKER);
-      setShowExecutionGate(false);
-    }}
-  />
-)}
-
+              redirectToBroker(DEFAULT_BROKER);
+              setShowExecutionGate(false);
+            }}
+          />
+        )}
       </div>
     </div>
   );
 };
+
 
 function formatTime(ms: number) {
   const h = Math.floor(ms / 3600000);
