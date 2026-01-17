@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { trackEvent } from "@/lib/events";
+import AISessionContext from "@/components/AISessionContext";
 
 export const dynamic = "force-dynamic";
 export default function HomePageUltraCleanProMaxMobile() {
@@ -89,14 +90,17 @@ export default function HomePageUltraCleanProMaxMobile() {
 
       <section className="pt-20 pb-20 container mx-auto text-center relative z-10 px-4">
         <h1 className="text-[36px] sm:text-[50px] md:text-[68px] font-extrabold leading-[1.1] mb-4 tracking-tight">
-          <span className="block text-gray-100 animate-fadeInUp delay-200">AI Trading Advisor</span>
-          <span className="block text-[#22ff88] animate-fadeInUp delay-400">
-            Precision-Driven Decisions, Not Hype
-          </span>
+          <span className="block text-gray-100">
+  Autonomous AI Trading System
+</span>
+<span className="block text-[#22ff88]">
+  Data-Driven Market Intelligence, Built for Control
+</span>
         </h1>
 
         <p className="text-gray-400 mb-10 max-w-[500px] sm:max-w-[600px] mx-auto text-[14px] sm:text-[15px] md:text-[16px] leading-relaxed animate-fadeInUp delay-600">
-          Leverage AI to optimize capital behavior, execute with clarity, and stay fully in control — actionable insights, risk-aware strategies, and data-first execution.
+          Leverage AI to analyze market conditions, evaluate risk,
+and support informed execution — without removing user control.
         </p>
 
         {/* ================= BUTTON NAVIGATE TO TRADE ================= */}
@@ -118,11 +122,11 @@ export default function HomePageUltraCleanProMaxMobile() {
     relative z-50
   "
 >
-  Start Optimizing →
+  Activate AI System →
 </Link>
 
 <p className="mt-3 text-xs text-gray-400">
-  Configure your AI preferences before connecting any execution account.
+  Configure your AI session preferences before enabling execution support.
 </p>
 
         {/* SUBTLE DIVIDER */}
@@ -148,6 +152,19 @@ export default function HomePageUltraCleanProMaxMobile() {
   Metrics reflect platform activity across live usage, simulations, and strategy testing environments.
 </p>
       </section>
+
+{/* ================= AI LIVE STATUS ================= */}
+<div className="mt-10 mb-16 px-6">
+  <div className="mx-auto max-w-4xl rounded-xl border border-green-500/30 bg-green-500/5 p-4 flex flex-wrap items-center justify-between gap-4 text-sm text-green-300">
+    <div className="flex items-center gap-2">
+      <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+      AI System Status: <span className="text-green-400">ACTIVE</span>
+    </div>
+
+    <div>Market Mode: <span className="text-green-400">Live Analysis</span></div>
+    <div>Session Load: <span className="text-green-400">Normal</span></div>
+  </div>
+</div>
 
       {/* ================= HOW THE AI WORKS ================= */}
       <section className="container mx-auto px-4 mt-28 relative z-10">
@@ -199,7 +216,7 @@ export default function HomePageUltraCleanProMaxMobile() {
       Data-Driven Decision Makers
     </span>
     <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10">
-      Traders Using External Brokers
+      Independent Trading Setups
     </span>
     <span className="px-4 py-2 rounded-full bg-white/5 border border-white/10">
       Risk-Conscious Strategies
@@ -218,8 +235,69 @@ export default function HomePageUltraCleanProMaxMobile() {
     </h3>
     <p className="text-sm text-gray-200">
       You maintain full control over your capital, execution decisions, and risk exposure at all times.
-      The AI never places trades or moves funds without user confirmation.
+      The AI does not place trades or move funds.
+All execution decisions remain entirely user-controlled.
     </p>
+  </div>
+</section>
+
+{/* ================= SECONDARY CTA ================= */}
+<section className="mt-24 text-center relative z-10">
+  <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+    Ready to Explore the AI System?
+  </h2>
+
+  <p className="text-gray-400 text-sm max-w-md mx-auto mb-8">
+    Configure your session, observe insights, and decide when to act.
+  </p>
+
+  <Link
+    href="/trade"
+    onClick={() => {
+      trackEvent("cta_click", {
+        tier: "soft",
+        source: "mid_page",
+      });
+    }}
+    className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-[#22ff88] text-black font-semibold hover:scale-105 transition"
+  >
+    Activate AI System →
+  </Link>
+</section>
+
+{/* ================= WHY USERS RETURN ================= */}
+<section className="mt-24 container mx-auto px-4 relative z-10">
+  <h3 className="text-xl sm:text-2xl font-semibold text-center mb-10">
+    Why Traders Keep Returning
+  </h3>
+
+  <div className="grid gap-6 sm:grid-cols-3 text-sm text-gray-300">
+    <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+      <span className="text-[#22ff88] font-semibold block mb-2">
+        Market Conditions Change
+      </span>
+      <p>
+        AI insights adapt to evolving volatility and structure throughout the day.
+      </p>
+    </div>
+
+    <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+      <span className="text-[#22ff88] font-semibold block mb-2">
+        Strategy Context Updates
+      </span>
+      <p>
+        Signals are re-evaluated as new data enters the system.
+      </p>
+    </div>
+
+    <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+      <span className="text-[#22ff88] font-semibold block mb-2">
+        Session-Based Insights
+      </span>
+      <p>
+        Each visit provides updated analytical context — not static results.
+      </p>
+    </div>
   </div>
 </section>
 
