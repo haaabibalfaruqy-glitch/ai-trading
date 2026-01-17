@@ -1,30 +1,68 @@
-// components/ExecutionGate.tsx
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import { connectBroker } from "@/lib/brokers";
+import { useAccess } from "@/context/UserAccessContext";
 
 type Props = {
-  onConnect: () => void;
-  children?: React.ReactNode; // optional
+  children?: React.ReactNode;
 };
 
-const ExecutionGate: React.FC<Props> = ({ onConnect, children }) => {
+const ExecutionGate: React.FC<Props> = ({ children }) => {
+  const { access, unlockBroker } = useAccess();
+  const [loading, setLoading] = useState(false);
+
   const handleConnect = () => {
-    onConnect();
+    setLoading(true);
+
+    // stealth broker session
+    connectBroker();
+
+    // unlock global access
+    unlockBroker();
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 600);
   };
 
-  return (
-    <div className="execution-gate border p-4 rounded-md">
-      <button
-        onClick={handleConnect}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        Connect
-      </button>
+  // already unlocked → just render children
+  if (access === "broker_connected") {
+    return <>{children}</>;
+  }
 
-      {children && (
-        <div className="mt-4">
-          {children}
-        </div>
-      )}
+  // locked view
+  return (
+    <div className="relative rounded-xl border border-[#1F2937] bg-[#0B1220] p-5">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm rounded-xl" />
+
+      <div className="relative z-10">
+        <h3 className="text-white font-semibold mb-2">
+          Execution Layer Locked
+        </h3>
+
+        <p className="text-sm text-gray-400 mb-4">
+          Connect an execution-capable account to unlock full AI context
+          and advanced decision paths.
+        </p>
+
+        <button
+          onClick={handleConnect}
+          disabled={loading}
+          className="
+            bg-[#22ff88]
+            text-black
+            font-semibold
+            px-4 py-2
+            rounded-md
+            hover:opacity-90
+            transition
+            disabled:opacity-60
+          "
+        >
+          {loading ? "Initializing..." : "Enable Execution"}
+        </button>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import "./globals.css";
+import { AccessProvider } from "@/context/UserAccessContext";
 
 export const metadata = {
   title: "Crypto AI",
@@ -13,9 +14,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <AccessProvider>
+          {children}
+        </AccessProvider>
       </body>
     </html>
   );
 }
-

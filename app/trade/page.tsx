@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import  AISessionContext  from "@/components/AISessionContext";
 import ExecutionGate from "@/components/ExecutionGate";
 import AITimeline from "@/components/AITimeline";
+import { BROKERS, BrokerKey } from "@/lib/brokers";
 import SessionDepthBar from "@/components/SessionDepthBar";
 import { trackEvent } from "@/lib/events";
 import {
@@ -14,7 +15,6 @@ import {
   subscribeFunnel,
 } from "@/lib/events";
 
-import { BROKERS, BrokerKey } from "@/lib/brokers";
 import { scheduler } from "@/lib/scheduler";
 import { generateMarketInsight } from "@/lib/insight";
 import { buildShareText } from "@/lib/share";
@@ -2566,27 +2566,10 @@ return (
 />
 
         {showExecutionGate && (
-          <ExecutionGate
-            onConnect={() => {
-              trackEvent("execution_gate_click", {
-                source: "trade_page",
-              });
-
-              const viralSent = sessionStorage.getItem("viralInsightSent");
-              if (!viralSent) {
-                trackEvent("viral_insight_generated", {
-                  context: "execution_gate",
-                  symbol: observedCoin?.coin.short ?? "unknown",
-                });
-
-                sessionStorage.setItem("viralInsightSent", "true");
-              }
-
-              redirectToBroker(DEFAULT_BROKER);
-              setShowExecutionGate(false);
-            }}
-          />
-        )}
+  <ExecutionGate>
+    {/* optional: konten setelah unlock */}
+  </ExecutionGate>
+)}
       </div>
 
       {isMobile && (
