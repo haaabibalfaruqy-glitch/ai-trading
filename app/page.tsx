@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { trackEvent } from "@/lib/events";
-import AISessionContext from "@/components/AISessionContext";
 
 export const dynamic = "force-dynamic";
 export default function HomePageUltraCleanProMaxMobile() {

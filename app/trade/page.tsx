@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchMarketSeries } from "@/lib/market";
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import  AISessionContext  from "@/components/AISessionContext";
+import AISessionContext from "@/components/AISessionContext";
 import ExecutionGate from "@/components/ExecutionGate";
 import AITimeline from "@/components/AITimeline";
 import { BROKERS, BrokerKey } from "@/lib/brokers";
@@ -14,6 +14,14 @@ import {
   getFunnelState,
   subscribeFunnel,
 } from "@/lib/events";
+
+import { 
+  SystemMode, 
+  CapitalMode, 
+  MarketSnapshot, 
+  Trend,
+  ObservedCoin 
+} from "@/lib/types";
 
 import { scheduler } from "@/lib/scheduler";
 import { generateMarketInsight } from "@/lib/insight";
@@ -83,21 +91,22 @@ const writeSession = (key: string, value: any) => {
 };
 
 // ================= META-LOGIC TYPES =================
-type MarketSnapshot = {
-  volatility: number;     // 0 - 100
-  trendStrength: number;  // 0 - 100
-  drawdown: number;       // %
-};
+// ❌ DELETE THESE - They're already imported above
+// type MarketSnapshot = {
+//   volatility: number;     // 0 - 100
+//   trendStrength: number;  // 0 - 100
+//   drawdown: number;       // %
+// };
 
-type CapitalMode =
-  | "Preservation"
-  | "Adaptive Growth"
-  | "Aggressive Expansion";
+// type CapitalMode =
+//   | "Preservation"
+//   | "Adaptive Growth"
+//   | "Aggressive Expansion";
 
-type SystemMode =
-  | "idle"
-  | "active"
-  | "error";
+// type SystemMode =
+//   | "idle"
+//   | "active"
+//   | "error";
 
 // =========================================
 // SMOOTH NUMBER ANIMATION (NO LIBRARY)
@@ -657,6 +666,9 @@ const OmegaCard = ({ coin, values, search, onView, systemMode }: any) => {
           <span className="text-[#7B8A9D] text-[11px] mb-1 tabular-nums transition-all duration-300">
             Volume
           </span>
+          <span className="text-white text-[16px] font-semibold">
+            --
+          </span>
         </div>
 
         <div className="flex flex-col items-center">
@@ -682,36 +694,34 @@ const OmegaCard = ({ coin, values, search, onView, systemMode }: any) => {
 const LiveProfitTable = ({ enabled }: { enabled: boolean }) => {
   const listRef = useRef<HTMLDivElement | null>(null);
 
-const randomUser = useCallback(
-  () => `user${Math.floor(Math.random() * 5000) + 1}`,
-  []
-);
+  const randomUser = useCallback(
+    () => `user${Math.floor(Math.random() * 5000) + 1}`,
+    []
+  );
 
-const generateRows = useCallback(() => (
-  Array.from({ length: 8 }).map(() => ({
-    id: crypto.randomUUID(),
-    user: randomUser(),
-    roi: (Math.random() * 30 + 5).toFixed(2),
-    profit: (Math.random() * 3000 + 500).toFixed(0),
-    status: Math.random() > 0.5 ? "WIN" : "LOSS",
-  }))
-), [randomUser]);
-
+  const generateRows = useCallback(() => (
+    Array.from({ length: 8 }).map(() => ({
+      id: crypto.randomUUID(),
+      user: randomUser(),
+      roi: (Math.random() * 30 + 5).toFixed(2),
+      profit: (Math.random() * 3000 + 500).toFixed(0),
+      status: Math.random() > 0.5 ? "WIN" : "LOSS",
+    }))
+  ), [randomUser]);
 
   const [rows, setRows] = useState(() => generateRows());
-
   const [updatedAt, setUpdatedAt] = useState("just now");
 
-useEffect(() => {
-  if (!enabled) return;
+  useEffect(() => {
+    if (!enabled) return;
 
-  const id = scheduler.register(() => {
-    setRows(generateRows());
-    setUpdatedAt("just now");
-  }, 2500);
+    const id = scheduler.register(() => {
+      setRows(generateRows());
+      setUpdatedAt("just now");
+    }, 2500);
 
-  return () => scheduler.clear(id);
-}, [enabled, generateRows]);
+    return () => scheduler.clear(id);
+  }, [enabled, generateRows]);
 
   return (
     <div className="
@@ -843,6 +853,7 @@ function smoothSeries(
 
   return result;
 }
+
 
 export default function TradePage() {
 useEffect(() => {
@@ -1339,7 +1350,6 @@ useEffect(() => {
   const sortedCoins = [...filteredCoins].sort(
     (a, b) => a.score - b.score
   );
-
   const TOTAL_PAGE = Math.max(
     1,
     Math.ceil(filteredCoins.length / PER_PAGE)
@@ -1432,6 +1442,18 @@ useEffect(() => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  function formatTime(timeLeft: number): string {
+    if (timeLeft <= 0) return "Expired";
+    
+    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
+  }
 
   return (
     <div
@@ -1676,6 +1698,7 @@ useEffect(() => {
           shadow-[inset_0_1px_0_#ffffff10]
           w-fit
         "
+
             >
 
               {/* PRIMARY CTA */}
@@ -2534,7 +2557,7 @@ return (
         {showExitGuard && (
           <div
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50
-      bg-[#0B1220] border border-[#22ff88]
+      bg-[#0B0F18] border border-[#22ff88]
       px-5 py-3 rounded-xl text-sm text-white
       shadow-[0_0_40px_rgba(34,255,136,0.25)]
     "
@@ -2585,15 +2608,6 @@ return (
     </p>
   </div>
 )}
-
     </div>
   );
 };
-
-
-function formatTime(ms: number) {
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  const s = Math.floor((ms % 60000) / 1000);
-  return `${h}h ${m}m ${s}s`;
-}
