@@ -1,6 +1,9 @@
 import { MarketPoint } from "./types";
 import { getDummyMarketSeries } from "./marketDummy";
 
+// Re-export MarketPoint type for convenient importing
+export type { MarketPoint };
+
 export async function fetchMarketSeries(symbol: string): Promise<MarketPoint[]> {
   try {
     const controller = new AbortController();

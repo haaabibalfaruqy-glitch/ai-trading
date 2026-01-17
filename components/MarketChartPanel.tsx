@@ -104,7 +104,7 @@ useEffect(() => {
   // Chart data untuk Line chart
   const chartData = useMemo(() => ({
   labels: data.map(point =>
-    new Date(point.time).toLocaleTimeString()
+    new Date(point.timestamp).toLocaleTimeString()
   ),
   datasets: [
     {
