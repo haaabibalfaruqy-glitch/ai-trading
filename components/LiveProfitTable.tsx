@@ -1,8 +1,6 @@
-interface Props {
-  enabled: boolean;
-}
+import { LiveProfitTableProps } from "@/lib/componentTypes";
 
-export default function LiveProfitTable({ enabled }: Props) {
+export default function LiveProfitTable({ enabled }: LiveProfitTableProps) {
   if (!enabled) return null;
 
   return (

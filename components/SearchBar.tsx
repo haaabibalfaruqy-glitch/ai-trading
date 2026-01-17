@@ -1,10 +1,6 @@
 "use client";
 
-interface SearchBarProps {
-  search: string;
-  setSearch: (v: string) => void;
-  filteredCoins: any[];
-}
+import { SearchBarProps } from "@/lib/componentTypes";
 
 export default function SearchBar({ search, setSearch, filteredCoins }: SearchBarProps) {
   return (

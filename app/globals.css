@@ -1,3 +1,4 @@
+/* ! @tailwind is a Tailwind CSS directive - these warnings can be safely ignored */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

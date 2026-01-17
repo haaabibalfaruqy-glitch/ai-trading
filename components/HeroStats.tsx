@@ -1,9 +1,6 @@
 "use client";
 
-interface HeroStatsProps {
-  systemMode: "active" | "idle";
-  capitalMode: "Preservation" | "Adaptive Growth" | "Aggressive Expansion";
-}
+import { HeroStatsProps } from "@/lib/componentTypes";
 
 export default function HeroStats({ systemMode, capitalMode }: HeroStatsProps) {
   return (

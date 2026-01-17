@@ -1,10 +1,8 @@
 "use client";
 
-export default function AISessionContext({
-  level,
-}: {
-  level: "partial" | "full";
-}) {
+import { AISessionContextProps } from "@/lib/componentTypes";
+
+export default function AISessionContext({ level }: AISessionContextProps) {
   return (
     <div
       className="

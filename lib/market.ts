@@ -1,7 +1,7 @@
 import { MarketPoint } from "./types";
 import { getDummyMarketSeries } from "./marketDummy";
 
-// Re-export MarketPoint type for convenient importing
+// Re-export type for convenient importing
 export type { MarketPoint };
 
 export async function fetchMarketSeries(symbol: string): Promise<MarketPoint[]> {

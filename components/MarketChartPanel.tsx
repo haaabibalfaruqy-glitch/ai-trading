@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { fetchMarketSeries, MarketPoint } from "@/lib/market";
+import { fetchMarketSeries } from "@/lib/market";
+import { MarketPoint } from "@/lib/types";
 import { useMemo } from "react";
 import { trackEvent } from "@/lib/events";
+import { MarketChartPanelProps } from "@/lib/componentTypes";
 
 // chart
 import {
@@ -32,10 +34,7 @@ ChartJS.register(
 export default function MarketChartPanel({
   symbol,
   onTrendChange,
-}: {
-  symbol: "bitcoin" | "ethereum";
-onTrendChange?: (trend: "up" | "down" | "flat") => void;
-}) {
+}: MarketChartPanelProps) {
 
 
 

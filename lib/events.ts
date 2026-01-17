@@ -49,7 +49,11 @@ export type EventType =
   | "insight_generated"
   | "insight_viewed"
   | "insight_shared"
-  | "viral_insight_generated";
+  | "viral_insight_generated"
+
+  // DASHBOARD INTERACTIONS
+  | "card_reordered"
+  | "card_order_reset";
 
 
 

@@ -33,6 +33,21 @@ import {
 } from "@/lib/premium";
 import { MEMBERSHIP } from "@/lib/membership";
 
+// ================= DRAG-AND-DROP HELPERS =================
+const saveCoinOrder = (order: string[]) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("coinOrder", JSON.stringify(order));
+  }
+};
+
+const loadCoinOrder = (): string[] | null => {
+  if (typeof window !== "undefined") {
+    const saved = localStorage.getItem("coinOrder");
+    return saved ? JSON.parse(saved) : null;
+  }
+  return null;
+};
+
 const isBrowser = typeof window !== "undefined";
 
 
@@ -882,6 +897,12 @@ useEffect(() => {
       );
     }
 
+    // Load saved card order
+    const saved = loadCoinOrder();
+    if (saved) {
+      setCardOrder(saved);
+    }
+
     setUnlocked(true);
   }, []);
 
@@ -958,6 +979,9 @@ useEffect(() => {
   const [trend, setTrend] = useState<
     "bullish" | "bearish" | "neutral"
   >("neutral");
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [cardOrder, setCardOrder] = useState<string[]>([]);
   const isRunning = systemMode === "active";
   const showEmptyState = systemMode === "idle";
   const percentChange =
@@ -1205,6 +1229,52 @@ useEffect(() => {
     if (saved) setSlotsLeft(Number(saved));
   }, []);
 
+  // ================= DRAG-AND-DROP HANDLERS =================
+  const handleDragStart = (e: React.DragEvent, coinName: string, idx: number) => {
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", coinName);
+    setDraggedIndex(idx);
+  };
+
+  const handleDragOver = (e: React.DragEvent, idx: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverIndex(idx);
+  };
+
+  const handleDrop = (e: React.DragEvent, idx: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === idx) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    const newOrder = [...sortedCoins];
+    const [draggedCoin] = newOrder.splice(draggedIndex, 1);
+    newOrder.splice(idx, 0, draggedCoin);
+
+    const orderNames = newOrder.map(c => c.name);
+    setCardOrder(orderNames);
+    saveCoinOrder(orderNames);
+
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+
+    trackEvent("card_reordered", {
+      from: draggedIndex,
+      to: idx,
+    });
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
 
   // ================= MODE COPY =================
   const MODE_COPY = {
@@ -1347,9 +1417,21 @@ useEffect(() => {
   });
 
   // ================= B5 — SORT BY SCORE =================
-  const sortedCoins = [...filteredCoins].sort(
-    (a, b) => a.score - b.score
-  );
+  const sortedCoins = useMemo(() => {
+    let sorted = [...filteredCoins].sort((a, b) => a.score - b.score);
+    
+    // Apply custom order if saved
+    if (cardOrder.length > 0) {
+      const orderMap = new Map(cardOrder.map((name, idx) => [name, idx]));
+      sorted = sorted.sort((a, b) => {
+        const orderA = orderMap.get(a.name) ?? Infinity;
+        const orderB = orderMap.get(b.name) ?? Infinity;
+        return orderA - orderB;
+      });
+    }
+    
+    return sorted;
+  }, [filteredCoins, cardOrder]);
   const TOTAL_PAGE = Math.max(
     1,
     Math.ceil(filteredCoins.length / PER_PAGE)
@@ -2474,27 +2556,44 @@ useEffect(() => {
 
             const idx = start + i;
             const values = liveData[idx];
+            const isDragging = draggedIndex === idx;
+            const isDragOver = dragOverIndex === idx;
 
 return (
-  <OmegaCard
+  <div
     key={coin.name}
-    coin={coin}
-    values={values}
-    search={search}
-    systemMode={systemMode}
-    onView={() => {
-      setCinemaMode(false);
-      setObservedCoin({ coin, values });
-      setLastAction(`VIEW_BEHAVIOR:${coin.short}`);
-    }}
-  />
+    draggable
+    onDragStart={(e) => handleDragStart(e, coin.name, idx)}
+    onDragOver={(e) => handleDragOver(e, idx)}
+    onDrop={(e) => handleDrop(e, idx)}
+    onDragLeave={handleDragLeave}
+    onDragEnd={handleDragEnd}
+    className={`
+      transition-all duration-200
+      ${isDragging ? "opacity-50 scale-95" : "opacity-100 scale-100"}
+      ${isDragOver ? "ring-2 ring-[#22ff88] ring-offset-2 ring-offset-[#0A0F1C]" : ""}
+      cursor-grab active:cursor-grabbing
+    `}
+  >
+    <OmegaCard
+      coin={coin}
+      values={values}
+      search={search}
+      systemMode={systemMode}
+      onView={() => {
+        setCinemaMode(false);
+        setObservedCoin({ coin, values });
+        setLastAction(`VIEW_BEHAVIOR:${coin.short}`);
+      }}
+    />
+  </div>
 );
           })
         )}
       </section>
 
 
-      {/* PAGINATION */}
+      {/* PAGINATION & CARD ORDER RESET */}
       <div className="flex justify-center items-center gap-2 mt-12">
         <button
           onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -2532,6 +2631,23 @@ return (
         >
           <ChevronRight size={18} />
         </button>
+
+        {cardOrder.length > 0 && (
+          <button
+            onClick={() => {
+              setCardOrder([]);
+              saveCoinOrder([]);
+              trackEvent("card_order_reset", {});
+            }}
+            className="ml-4 px-3 py-1.5 text-xs rounded-lg
+              bg-[#1E293B] hover:bg-[#22ff8820]
+              text-gray-400 hover:text-[#22ff88]
+              transition border border-[#1E293B] hover:border-[#22ff88]/40"
+            title="Reset card order to default"
+          >
+            Reset Layout
+          </button>
+        )}
 
 
         {bigWin && (

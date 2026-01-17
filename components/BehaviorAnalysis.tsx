@@ -1,13 +1,6 @@
 "use client";
 
-interface BehaviorAnalysisProps {
-  observedCoin: { coin: any; values: number[] };
-  viralInsight: string | null;
-  highlightAnalysis: boolean;
-  shareText: string | null;
-  slotsLeft: number;
-  setShowExecutionGate: (v: boolean) => void;
-}
+import { BehaviorAnalysisProps } from "@/lib/componentTypes";
 
 export default function BehaviorAnalysis({
   observedCoin,

@@ -1,11 +1,6 @@
 "use client";
 
-interface FilterBarProps {
-  activeFilter: string;
-  setActiveFilter: (v: string) => void;
-  setRisk: (v: "all" | "low" | "medium" | "high") => void;
-  setTimeframe: (v: "all" | "scalp" | "long") => void;
-}
+import { FilterBarProps } from "@/lib/componentTypes";
 
 export default function FilterBar({ activeFilter, setActiveFilter, setRisk, setTimeframe }: FilterBarProps) {
   return (
