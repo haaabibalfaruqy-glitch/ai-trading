@@ -40,6 +40,11 @@ export interface ObservedCoin {
 }
 
 export type MarketPoint = {
-  timestamp: number;
-  price: number;
+  timestamp: number; // Unix timestamp in milliseconds
+  price: number; // Current price
+  volume?: number; // Trading volume
+  open?: number; // Opening price for period
+  high?: number; // Highest price for period
+  low?: number; // Lowest price for period
+  close?: number; // Closing price for period
 };

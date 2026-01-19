@@ -3,17 +3,7 @@ import { useMemo, useEffect, useState, useCallback } from "react";
 import { Coin, SystemMode } from "@/lib/types";
 import { scheduler } from "@/lib/scheduler";
 import { useAccess } from "@/context/UserAccessContext";
-
-const animateNumber = (from: number, to: number, duration: number, onUpdate: (v: number) => void) => {
-  const start = typeof performance !== "undefined" ? performance.now() : Date.now();
-  const tick = (now: number) => {
-    const progress = Math.min((now - start) / duration, 1);
-    const value = from + (to - from) * progress;
-    onUpdate(value);
-    if (progress < 1) requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-};
+import { animateNumber } from "@/lib";
 
 // Generate realistic AI predictions based on market data
 const generateAIPredictions = (coin: Coin, baseValues: number[]) => {
@@ -59,7 +49,9 @@ export const OmegaCard = ({ coin, values, search, onView, systemMode }: any) => 
     const id = scheduler.register(() => {
       setProfit(p => p + Math.floor(Math.random() * 120));
     }, 1200 + Math.random() * 800);
-    return () => scheduler.clear(id);
+    return () => {
+      scheduler.clear(id);
+    };
   }, [systemMode]);
 
   const handleCardClick = (e: React.MouseEvent) => {

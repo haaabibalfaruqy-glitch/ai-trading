@@ -75,9 +75,36 @@ export {
   generateMarketInsight as generateMarketInsightFromSeries,
   mapTrendToSignal,
   DUMMY_MARKET_DATA,
+  fetchMarketData,
+  subscribeToMarketData,
+  convertRawToMarketPoints,
+  generateAIPredictions,
+  generateAIInsights,
+  analyzeMarket,
+  calculateVolatility,
+  calculateRSI,
+  calculateMACD,
+  calculateSMA,
+  calculateEMA,
+} from "./market";
+export type {
+  MarketDataResponse,
+  FetchMarketOptions,
+  AIPrediction,
+  MarketAnalysis,
 } from "./market";
 export { convertToMarketPoints } from "./marketData";
 export { getDummyMarketSeries } from "./marketDummy";
+export {
+  loadMarketAnalysis,
+  loadMarketDataFetcher,
+  loadAndGenerateInsights,
+  batchAnalyzeSymbols,
+  cachedAnalyzeSymbol,
+  clearAnalysisCache,
+  analyzeMarketStream,
+  getWorkerAnalysisConfig,
+} from "./marketAnalysisDynamic";
 
 // Insights & Share
 export type { Trend as InsightTrend } from "./insight";
@@ -99,6 +126,20 @@ export { scheduler } from "./scheduler";
 
 // Utilities
 export { seededRandom, resetSeed } from "./seededRandom";
+
+// Storage Utilities
+export {
+  loadCoinOrder,
+  saveCoinOrder,
+  readSession,
+  writeSession,
+} from "./utils/storage";
+
+// Animation Utilities
+export { animateNumber } from "./utils/animations";
+
+// UI Utilities
+export { mapTrendToDirection } from "./utils/ui";
 
 // Membership
 export { MEMBERSHIP } from "./membership";

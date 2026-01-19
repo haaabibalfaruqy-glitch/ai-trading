@@ -11,7 +11,8 @@ export interface MarketChartPanelProps {
 }
 
 export interface LiveProfitTableProps {
-  enabled: boolean;
+  enabled?: boolean;
+  onRefresh?: () => void;
 }
 
 export interface MarketTickerProps {
