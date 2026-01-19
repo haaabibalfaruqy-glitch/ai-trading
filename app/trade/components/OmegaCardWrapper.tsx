@@ -1,43 +1,36 @@
 import { OmegaCard } from "@/components/OmegaCard";
-import { computeTrend } from "./TrendCalculator";
+import { Trend } from "./TrendCalculator";
+
+interface Props {
+  coin: any;
+  idx: number;
+  realSeries: number[] | null;
+  liveData: number[][];
+  N: number;
+  search: string;
+  systemMode: string;
+  onView: () => void;
+}
 
 export default function OmegaCardWrapper({
-  coinList,
-  observedCoin,
-  setObservedCoin,
-  cinemaMode,
-  handleDragStart,
-  handleDragOver,
-  handleDrop,
-  handleDragLeave,
-}: any) {
-  const N = 30;
+  coin,
+  idx,
+  realSeries,
+  liveData,
+  N,
+  search,
+  systemMode,
+  onView
+}: Props) {
+  const values = realSeries?.slice(-N) || liveData[idx];
 
   return (
-    <>
-      {coinList.map((coin: any, idx: number) => {
-        const rawValues = coin.realSeries || coin.liveData || [];
-        const values = rawValues.slice(-N);
-        const trend = computeTrend(values);
-
-        return (
-          <div
-            key={coin.name}
-            draggable
-            onDragStart={(e) => handleDragStart(e, coin.name, idx)}
-            onDragOver={(e) => handleDragOver(e, idx)}
-            onDrop={(e) => handleDrop(e, idx)}
-            onDragLeave={handleDragLeave}
-          >
-            <OmegaCard
-              coin={coin}
-              values={values}
-              systemMode="idle"
-              onView={() => setObservedCoin({ coin, values })}
-            />
-          </div>
-        );
-      })}
-    </>
+    <OmegaCard
+      coin={coin}
+      values={values}
+      search={search}
+      systemMode={systemMode}
+      onView={onView}
+    />
   );
 }
