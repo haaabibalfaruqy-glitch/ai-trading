@@ -102,7 +102,7 @@ export default function TradeHero({
             className={`
               px-3 py-1 rounded-full text-[10px] font-semibold border
               ${
-                capitalMode === "growth"
+                capitalMode === "Adaptive Growth"
                   ? "text-[#22ff88] border-[#22ff88]/40 bg-[#22ff88]/10"
                   : "text-yellow-400 border-yellow-400/40 bg-yellow-400/10"
               }

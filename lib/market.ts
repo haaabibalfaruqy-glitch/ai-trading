@@ -5,50 +5,43 @@ import { generateAIPredictions, analyzeMarket } from "./aiPredictions";
 import { generateDetailedInsight } from "./insight";
 
 /* ====================
-   DUMMY COINS (Sync Base)
+    DUMMY COINS (Sync Base)
 ==================== */
 export const coins: Coin[] = [
-  { name: "Bitcoin", short: "BTC", symbol: "BTC", price: 65000, change24h: 2.5 },
-  { name: "Ethereum", short: "ETH", symbol: "ETH", price: 3500, change24h: -1.2 },
-  { name: "Solana", short: "SOL", symbol: "SOL", price: 145, change24h: 5.8 },
-  { name: "Cardano", short: "ADA", symbol: "ADA", price: 0.45, change24h: 0.5 },
+  { name: "Bitcoin", short: "BTC", symbol: "BTC", price: 65000, change24h: 2.5, change: 2.5 },
+  { name: "Ethereum", short: "ETH", symbol: "ETH", price: 3500, change24h: -1.2, change: -1.2 },
+  { name: "Solana", short: "SOL", symbol: "SOL", price: 145, change24h: 5.8, change: 5.8 },
+  { name: "Cardano", short: "ADA", symbol: "ADA", price: 0.45, change24h: 0.5, change: 0.5 },
 ];
 
+// Alias untuk memenuhi kebutuhan lib/index.ts (DUMMY_MARKET_DATA)
+export const DUMMY_MARKET_DATA = coins;
+
 /* ====================
-   INTERNAL CACHE (Kunci Sinkronisasi)
+    INTERNAL CACHE
 ==================== */
-// Menyimpan data market terakhir agar Homepage & Dashboard ambil dari 'ember' yang sama
 const marketCache = new Map<string, MarketPoint[]>();
 
 /* ====================
-   CORE MARKET FUNCTIONS
+    CORE MARKET FUNCTIONS
 ==================== */
 
-/**
- * Simulasi pergerakan harga yang lebih realistis (Walk Algorithm)
- */
 function generatePriceSeries(base: number, length: number = 20): number[] {
   let current = base;
   return Array.from({ length }, () => {
-    const change = current * (Math.random() * 0.002 - 0.001); // Max 0.1% per titik
+    const change = current * (Math.random() * 0.002 - 0.001);
     current += change;
     return Number(current.toFixed(2));
   });
 }
 
-/**
- * Fetch Market Data dengan Sinkronisasi Cache
- */
 export async function fetchMarketData(symbol: string): Promise<{
   symbol: string;
   points: MarketPoint[];
   latestPrice: number;
 }> {
-  // Ambil harga dasar dari list coins
   const coinInfo = coins.find(c => c.symbol === symbol);
   const basePrice = coinInfo?.price || 100;
-
-  // Cek apakah sudah ada di cache (untuk menghindari angka loncat-loncat)
   let points = marketCache.get(symbol);
 
   if (!points) {
@@ -68,9 +61,6 @@ export async function fetchMarketData(symbol: string): Promise<{
   };
 }
 
-/**
- * Fungsi Live Update untuk Dashboard & Homepage (Real-time Sync)
- */
 export function subscribeToMarketData(
   symbol: string,
   callback: (data: { points: MarketPoint[]; latestPrice: number }) => void,
@@ -78,8 +68,6 @@ export function subscribeToMarketData(
 ) {
   const ticker = setInterval(async () => {
     const data = await fetchMarketData(symbol);
-    
-    // Simulasi update harga terakhir (Tick)
     const lastPoint = data.points[data.points.length - 1];
     const newPrice = lastPoint.price + (lastPoint.price * (Math.random() * 0.001 - 0.0005));
     
@@ -96,7 +84,7 @@ export function subscribeToMarketData(
 }
 
 /* ====================
-   ANALYSIS + AI (Ready for Production)
+    ANALYSIS + AI
 ==================== */
 
 export async function analyzeCoinMarket(symbol: string) {
@@ -111,6 +99,19 @@ export async function analyzeCoinMarket(symbol: string) {
     prediction,
     signal: mapTrendToSignal(prediction.trend)
   };
+}
+
+// C:\ai_trading\lib\market.ts
+
+export async function generateCoinInsight(symbol: string) {
+  // 1. Ambil data market (points) terlebih dahulu
+  const { points } = await fetchMarketData(symbol);
+  
+  // 2. Buat prediksi berdasarkan points tersebut (menghasilkan tipe AIPrediction)
+  const prediction = generateAIPredictions(points);
+  
+  // 3. Kirim hasil prediksi ke fungsi insight
+  return generateDetailedInsight(prediction);
 }
 
 export function mapTrendToSignal(trend: "bullish" | "bearish" | "neutral") {

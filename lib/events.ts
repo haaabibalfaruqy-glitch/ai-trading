@@ -3,7 +3,7 @@
 import { featureStateManager } from "./featureStateManager";
 
 /* ============================================================
-    TYPES & ENUMERATIONS (Synchronized with All Groups)
+    TYPES & ENUMERATIONS
 ============================================================ */
 export type EventType =
   | "page_view" | "cta_click" | "cta_click_hero" | "module_view"
@@ -11,8 +11,10 @@ export type EventType =
   | "execution_blocked" | "premium_cta_click" | "feature_unlock_requested"
   | "feature_unlock_success" | "feature_unlock_failed" | "feature_lock"
   | "market_chart_view" | "insight_generated" | "insight_shared"
-  | "exit_intent" | "trust_pulse" | "user_resurrected";
-  
+  | "exit_intent" | "trust_pulse" | "user_resurrected" | "feature_usage"
+  | "feature_explorer_opened" | "homepage_viewed"
+  | (string & {}); 
+
 export interface EventPayload {
   type: EventType;
   meta?: Record<string, any>;
@@ -30,7 +32,7 @@ export interface FunnelState {
 }
 
 /* ============================================================
-    STATE & SESSION (Next.js Optimized)
+    STATE & SESSION
 ============================================================ */
 const FUNNEL_KEY = "omega_funnel_v2";
 const SESSION_KEY = "omega_session_id";
@@ -45,9 +47,6 @@ function getSessionId(): string {
   return id;
 }
 
-/* ============================================================
-    CORE TRACKING ENGINE
-============================================================ */
 let funnelState: FunnelState = {
   sawChart: false,
   clickedSoftCTA: false,
@@ -57,11 +56,12 @@ let funnelState: FunnelState = {
 };
 
 const eventListeners = new Set<(ev: EventPayload) => void>();
+const funnelListeners = new Set<(state: FunnelState) => void>();
 
-/**
- * Enterprise Event Tracker: 
- * Mencatat kejadian dan mensinkronisasi state aplikasi secara global.
- */
+/* ============================================================
+    CORE TRACKING ENGINE
+============================================================ */
+
 export function trackEvent(type: EventType, meta?: Record<string, any>): EventPayload {
   const event: EventPayload = {
     type,
@@ -71,16 +71,10 @@ export function trackEvent(type: EventType, meta?: Record<string, any>): EventPa
   };
 
   if (typeof window !== "undefined") {
-    // 1. Update Internal Funnel
     updateFunnelLogic(type, meta);
-    
-    // 2. Local Storage Persistence
     saveToStorage(event);
-
-    // 3. Global Notification (Sinkronisasi UI)
     eventListeners.forEach(listener => listener(event));
 
-    // 4. Debugging (Hanya di Dev)
     if (process.env.NODE_ENV === "development") {
       console.log(`%c[EVENT: ${type}]`, "color: #10b981; font-weight: bold", meta);
     }
@@ -89,9 +83,32 @@ export function trackEvent(type: EventType, meta?: Record<string, any>): EventPa
   return event;
 }
 
+export function trackFeatureEvent(featureName: string, action: string, meta?: any) {
+  return trackEvent("feature_usage", {
+    feature: featureName,
+    action: action,
+    ...meta
+  });
+}
+
 /* ============================================================
-    FUNNEL LOGIC (The Path to Conversion)
+    FIX: FUNNEL SUBSCRIPTION (Dibutuhkan oleh useEventScheduler)
 ============================================================ */
+
+/**
+ * Berlangganan pada perubahan state funnel secara real-time.
+ */
+export function subscribeFunnel(callback: (state: FunnelState) => void) {
+  funnelListeners.add(callback);
+  // Kirim state saat ini segera setelah berlangganan
+  callback(getFunnelAnalytics());
+  return () => funnelListeners.delete(callback);
+}
+
+/* ============================================================
+    FUNNEL LOGIC
+============================================================ */
+
 function updateFunnelLogic(type: EventType, meta?: Record<string, any>) {
   funnelState.lastEventType = type;
 
@@ -103,7 +120,11 @@ function updateFunnelLogic(type: EventType, meta?: Record<string, any>) {
     case "feature_unlock_success": funnelState.featureUnlocksCount++; break;
   }
 
-  localStorage.setItem(FUNNEL_KEY, JSON.stringify(funnelState));
+  if (typeof window !== "undefined") {
+    localStorage.setItem(FUNNEL_KEY, JSON.stringify(funnelState));
+    // Beritahu semua subscriber funnel bahwa state berubah
+    funnelListeners.forEach(listener => listener({ ...funnelState }));
+  }
 }
 
 function saveToStorage(event: EventPayload) {
@@ -117,20 +138,25 @@ function saveToStorage(event: EventPayload) {
 /* ============================================================
     HOOKS & UTILITIES
 ============================================================ */
+
 export function subscribeToEvents(callback: (ev: EventPayload) => void) {
   eventListeners.add(callback);
   return () => eventListeners.delete(callback);
 }
 
-export function getFunnelAnalytics() {
+export function getFunnelAnalytics(): FunnelState {
   if (typeof window === "undefined") return funnelState;
   const stored = localStorage.getItem(FUNNEL_KEY);
-  return stored ? JSON.parse(stored) : funnelState;
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      return funnelState;
+    }
+  }
+  return funnelState;
 }
 
-/**
- * Spesifik untuk integrasi dengan FeatureLock (Urutan 5)
- */
 export function trackFeatureUnlock(featureId: string, success: boolean) {
   return trackEvent(success ? "feature_unlock_success" : "feature_unlock_failed", {
     featureId,

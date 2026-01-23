@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAccess } from "@/context/UserAccessContext";
-import Tooltip from "./Tooltip";
+import Tooltip from '@/app/Shared/Tooltip';
 import { Lock, TrendingUp, Shield, Activity } from "lucide-react";
 
 /* ================= TYPES ================= */

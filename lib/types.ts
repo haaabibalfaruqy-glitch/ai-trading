@@ -2,7 +2,8 @@
 
 export type SystemMode = "idle" | "active" | "error";
 
-export type CapitalMode = "preservation" | "growth" | "aggressive";
+// Kita standarisasi CapitalMode agar sinkron di UI mana pun
+export type CapitalMode = "Preservation" | "Adaptive Growth" | "Aggressive Expansion";
 
 export type RiskLevel = "low" | "medium" | "high";
 export type Timeframe = "scalp" | "long";
@@ -15,30 +16,32 @@ export interface MarketSnapshot {
   drawdown: number;
 }
 
+// C:\ai_trading\lib\componentTypes.ts
+
 export interface Coin {
-  name: string;
   symbol: string;
+  name: string;
   short: string;
   price?: number;
-  risk?: RiskLevel;
-  timeframe?: Timeframe;
-  aiPick?: boolean;
+  change?: number;      // <--- Pastikan ini ada
+  change24h?: number;   // <--- Pastikan ini ada
 }
 
 export interface TradeRow {
   id: string;
   user: string;
-  roi: string;
-  profit: string;
+  roi: string; // Misal: "+12.5%"
+  profit: string; // Misal: "+$150.00"
   status: "WIN" | "LOSS";
+  timestamp: number; // Tambahan agar bisa diurutkan (sinkron)
 }
 
 export interface ObservedCoin {
   coin: Coin;
-  values: number[];
+  values: number[]; // Array harga untuk sparkline/chart mini
 }
 
-export type MarketPoint = {
+export interface MarketPoint {
   timestamp: number;
   price: number;
   volume?: number;
@@ -46,4 +49,4 @@ export type MarketPoint = {
   high?: number;
   low?: number;
   close?: number;
-};
+}

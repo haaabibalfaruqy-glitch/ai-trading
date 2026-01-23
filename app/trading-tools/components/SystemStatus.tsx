@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { SystemMode } from "@/lib/types";
 import { useAccess } from "@/context/UserAccessContext";
-import Tooltip from "@/app/Shared/Tooltip";
+import Tooltip from '@/app/Shared/Tooltip';
 import { Activity, AlertTriangle, CheckCircle, Lock, Zap } from "lucide-react";
 
 interface Props {

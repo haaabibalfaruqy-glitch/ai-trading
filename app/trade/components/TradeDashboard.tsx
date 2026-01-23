@@ -87,12 +87,12 @@ export default function TradeDashboard({
       </div>
 
       {/* SECTION 2: SYSTEM HEALTH */}
-      <SystemStatusPanel 
-        systemMode={systemMode} 
-        capitalMode={capitalMode} 
-        coins={coins} 
-        volatility={1.24} 
-      />
+<SystemStatusPanel 
+  systemMode={systemMode as any} 
+  capitalMode={capitalMode as any} 
+  coins={coins} 
+  volatility={1.24} 
+/>
 
       {/* SECTION 3: SEARCH & FILTERS */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white/[0.02] border border-white/[0.05] p-4 rounded-[2rem] backdrop-blur-md">

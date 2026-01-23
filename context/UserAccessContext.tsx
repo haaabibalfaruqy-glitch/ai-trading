@@ -1,5 +1,3 @@
-// C:\ai_trading\context\UserAccessContext.tsx
-
 "use client";
 
 import {
@@ -31,12 +29,12 @@ export interface AccessContextType {
   isAuthenticated: boolean;
   isPremium: boolean;
   isBrokerUnlocked: boolean;
-  isLoading: boolean; // Tambahan untuk handle loading state
+  isLoading: boolean;
 }
 
 /* ================= CONSTANTS ================= */
 
-const STORAGE_KEY = "ai_trading_access_vault"; // Key unik agar tidak bentrok
+const STORAGE_KEY = "ai_trading_access_vault";
 
 const AccessContext = createContext<AccessContextType | null>(null);
 
@@ -47,7 +45,6 @@ export function AccessProvider({ children }: { children: ReactNode }) {
   const [userAccess, setUserAccess] = useState<UserAccess | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fungsi Reset (dibuat hoisting agar bisa dipanggil di useEffect)
   const resetAccess = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setAccess("guest");
@@ -62,7 +59,6 @@ export function AccessProvider({ children }: { children: ReactNode }) {
         if (saved) {
           const parsed: UserAccess = JSON.parse(saved);
 
-          // Cek Expiry
           if (parsed.expiresAt && Date.now() > parsed.expiresAt) {
             resetAccess();
           } else {
@@ -77,10 +73,7 @@ export function AccessProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Jalankan saat pertama load
     syncAccess();
-
-    // Listener untuk sinkronisasi antar TAB browser
     window.addEventListener("storage", syncAccess);
     return () => window.removeEventListener("storage", syncAccess);
   }, [resetAccess]);
@@ -104,12 +97,11 @@ export function AccessProvider({ children }: { children: ReactNode }) {
     updateAccess({
       state: "premium",
       connectedAt: Date.now(),
-      expiresAt: expiresAt || Date.now() + 30 * 24 * 60 * 60 * 1000, // Default 30 hari
+      expiresAt: expiresAt || Date.now() + 30 * 24 * 60 * 60 * 1000,
     });
   }, [updateAccess]);
 
   /* ===== DERIVED VALUES ===== */
-  // useMemo memastikan komponen tidak re-render kecuali data ini berubah
   const value = useMemo(() => ({
     access,
     userAccess,
@@ -135,4 +127,20 @@ export function useAccess() {
   const ctx = useContext(AccessContext);
   if (!ctx) throw new Error("useAccess must be used within AccessProvider");
   return ctx;
+}
+
+export function useIsAuthenticated() {
+  const { isAuthenticated } = useAccess();
+  return isAuthenticated;
+}
+
+export function useIsPremium() {
+  const { isPremium } = useAccess();
+  return isPremium;
+}
+
+// FIX: Menambahkan hook yang dicari oleh lib/contextTypes.ts
+export function useIsBrokerUnlocked() {
+  const { isBrokerUnlocked } = useAccess();
+  return isBrokerUnlocked;
 }
