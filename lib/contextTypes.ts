@@ -1,13 +1,11 @@
-/* Re-export all context types for convenient importing */
-export type {
-  AccessState,
-  UserAccess,
-  AccessContextType,
-  AccessProviderProps,
-} from "@/context/UserAccessContext";
+// lib/contextTypes.ts
+import { ReactNode } from "react";
+import { AccessState, UserAccess, AccessContextType } from "@/context/UserAccessContext";
 
-export {
-  useAccess,
-  useIsAuthenticated,
-  useIsPremium,
-} from "@/context/UserAccessContext";
+export type { AccessState, UserAccess, AccessContextType };
+
+export interface AccessProviderProps {
+  children: ReactNode;
+}
+
+export { useAccess, useIsAuthenticated, useIsPremium, useIsBrokerUnlocked } from "@/context/UserAccessContext";

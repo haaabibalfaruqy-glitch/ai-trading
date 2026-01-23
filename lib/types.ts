@@ -1,11 +1,8 @@
-// Core type definitions for the trading system
+// C:\ai_trading\lib\types.ts
 
 export type SystemMode = "idle" | "active" | "error";
 
-export type CapitalMode =
-  | "Preservation"
-  | "Adaptive Growth"
-  | "Aggressive Expansion";
+export type CapitalMode = "preservation" | "growth" | "aggressive";
 
 export type RiskLevel = "low" | "medium" | "high";
 export type Timeframe = "scalp" | "long";
@@ -20,9 +17,11 @@ export interface MarketSnapshot {
 
 export interface Coin {
   name: string;
+  symbol: string;
   short: string;
-  risk: RiskLevel;
-  timeframe: Timeframe;
+  price?: number;
+  risk?: RiskLevel;
+  timeframe?: Timeframe;
   aiPick?: boolean;
 }
 
@@ -40,11 +39,11 @@ export interface ObservedCoin {
 }
 
 export type MarketPoint = {
-  timestamp: number; // Unix timestamp in milliseconds
-  price: number; // Current price
-  volume?: number; // Trading volume
-  open?: number; // Opening price for period
-  high?: number; // Highest price for period
-  low?: number; // Lowest price for period
-  close?: number; // Closing price for period
+  timestamp: number;
+  price: number;
+  volume?: number;
+  open?: number;
+  high?: number;
+  low?: number;
+  close?: number;
 };

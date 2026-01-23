@@ -1,16 +1,12 @@
-/**
- * Market Data Fetcher with Access Control
- * Handles real-time market data fetching with broker access verification
- */
+// C:\ai_trading\lib\marketDataFetcher.ts
 
 import { MarketPoint } from "@/lib/types";
 import { getDummyMarketSeries } from "@/lib/marketDummy";
 import { AccessState } from "@/context/UserAccessContext";
 
 /* ============================================================
-   TYPES
+    TYPES
 ============================================================ */
-
 export interface FetchMarketOptions {
   symbol: string;
   timeframe?: "1m" | "5m" | "15m" | "1h" | "4h" | "1d";
@@ -28,231 +24,127 @@ export interface MarketDataResponse {
 }
 
 /* ============================================================
-   MARKET DATA CACHE
+    MARKET DATA CACHE (Global Singularity)
 ============================================================ */
-
 const marketDataCache = new Map<string, MarketDataResponse>();
 
-function getCacheKey(symbol: string, timeframe: string): string {
-  return `${symbol}:${timeframe}`;
-}
+const getCacheKey = (symbol: string, timeframe: string) => `${symbol}:${timeframe}`;
 
-function isCacheValid(cachedData: MarketDataResponse, maxAgeMs: number = 60000): boolean {
-  return Date.now() - cachedData.timestamp < maxAgeMs;
-}
+const isCacheValid = (cached: MarketDataResponse) => Date.now() - cached.timestamp < 15000; // 15 detik saja untuk real-time trading
 
 /* ============================================================
-   ACCESS CONTROL HELPERS
+    ACCESS CONTROL (Security Hardening)
 ============================================================ */
-
-function isAccessAllowed(access: AccessState): boolean {
-  // Guest access is restricted
-  // broker_connected and premium have full access
-  return access !== "guest";
-}
-
-function maskDataForGuest(data: MarketPoint[]): MarketPoint[] {
-  // For guests, only show low-resolution data (every 5th point)
-  return data.filter((_, idx) => idx % 5 === 0);
-}
-
-/* ============================================================
-   REAL-TIME MARKET DATA FETCHING
-============================================================ */
+const isFullAccess = (access: AccessState) => access === "premium" || access === "broker_connected";
 
 /**
- * Fetch market data from real API or fallback to dummy data
- * Respects access control - restricted for guests
+ * Masking Data: User Guest hanya melihat data resolusi rendah
  */
-export async function fetchMarketData(
-  options: FetchMarketOptions
-): Promise<MarketDataResponse> {
-  const {
-    symbol,
-    timeframe = "1h",
-    limit = 100,
-    access = "guest",
-  } = options;
+const maskDataForGuest = (data: MarketPoint[]) => {
+  return data.filter((_, idx) => idx % 4 === 0); // 25% resolusi untuk guest
+};
 
+/* ============================================================
+    CORE FETCH ENGINE
+============================================================ */
+export async function fetchMarketData(options: FetchMarketOptions): Promise<MarketDataResponse> {
+  const { symbol, timeframe = "1h", limit = 100, access = "guest" } = options;
   const cacheKey = getCacheKey(symbol, timeframe);
-  const locked = !isAccessAllowed(access);
+  const hasFullAccess = isFullAccess(access);
 
-  // Check cache first
+  // 1. Check Global Cache
   const cached = marketDataCache.get(cacheKey);
-  if (cached && isCacheValid(cached) && !locked) {
-    return {
-      ...cached,
-      source: "cache",
-      accessLevel: access,
-    };
+  if (cached && isCacheValid(cached)) {
+    return { ...cached, source: "cache", accessLevel: access };
   }
 
   try {
-    // Attempt real API fetch (with timeout)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeout = setTimeout(() => controller.abort(), 4000);
 
+    // Mock API Call - Replace with your actual exchange API (Binance/Bybit)
     const response = await fetch(
-      `https://api.example.com/market/${symbol}?timeframe=${timeframe}&limit=${limit}`,
+      `https://api.exchange.com/v1/klines?symbol=${symbol}&interval=${timeframe}&limit=${limit}`,
       { signal: controller.signal }
-    );
+    ).catch(() => ({ ok: false }));
 
-    clearTimeout(timeoutId);
+    clearTimeout(timeout);
 
-    if (response.ok) {
-      const rawData = await response.json();
-      const marketPoints = convertRawToMarketPoints(rawData);
+    let marketPoints: MarketPoint[] = [];
 
-      const result: MarketDataResponse = {
-        success: true,
-        data: locked ? maskDataForGuest(marketPoints) : marketPoints,
-        source: "api",
-        timestamp: Date.now(),
-        accessLevel: access,
-        locked,
-      };
-
-      // Cache successful result
-      if (!locked) {
-        marketDataCache.set(cacheKey, result);
-      }
-
-      return result;
+    if (response && 'ok' in response && response.ok) {
+      const rawData = await (response as Response).json();
+      marketPoints = convertRawToMarketPoints(rawData);
+    } else {
+      // Fallback to Intelligent Dummy Data
+      marketPoints = getDummyMarketSeries().map(p => ({
+        ...p,
+        timestamp: Date.now() - (Math.random() * 1000) // Adjust timestamp to current
+      }));
     }
+
+    const result: MarketDataResponse = {
+      success: marketPoints.length > 0,
+      data: hasFullAccess ? marketPoints : maskDataForGuest(marketPoints),
+      source: response && 'ok' in response && response.ok ? "api" : "dummy",
+      timestamp: Date.now(),
+      accessLevel: access,
+      locked: !hasFullAccess,
+    };
+
+    // Cache only valid data
+    if (result.data.length > 0) marketDataCache.set(cacheKey, result);
+    return result;
+
   } catch (error) {
-    console.warn(`[Market API Error] Failed to fetch ${symbol}:`, error);
+    return {
+      success: false,
+      data: maskDataForGuest(getDummyMarketSeries()),
+      source: "dummy",
+      timestamp: Date.now(),
+      accessLevel: access,
+      locked: !hasFullAccess,
+    };
   }
-
-  // Fallback to dummy data
-  const dummyData = getDummyMarketSeries();
-
-  const result: MarketDataResponse = {
-    success: false,
-    data: locked ? maskDataForGuest(dummyData) : dummyData,
-    source: "dummy",
-    timestamp: Date.now(),
-    accessLevel: access,
-    locked,
-  };
-
-  return result;
 }
 
-/**
- * Fetch market data for multiple symbols
- */
-export async function fetchMultipleMarketData(
-  symbols: string[],
-  options?: Omit<FetchMarketOptions, "symbol">
-): Promise<Record<string, MarketDataResponse>> {
-  const results: Record<string, MarketDataResponse> = {};
-
-  const promises = symbols.map((symbol) =>
-    fetchMarketData({ ...options, symbol }).then((data) => {
-      results[symbol] = data;
-    })
-  );
-
-  await Promise.all(promises);
-  return results;
-}
-
-/**
- * Subscribe to real-time market data updates
- * Returns unsubscribe function
- */
+/* ============================================================
+    REAL-TIME SUBSCRIPTION (Synchronized)
+============================================================ */
 export function subscribeToMarketData(
   symbol: string,
   callback: (data: MarketPoint[]) => void,
   options?: Omit<FetchMarketOptions, "symbol">
 ): () => void {
-  // Simulate real-time updates
-  const interval = setInterval(async () => {
-    const response = await fetchMarketData({
-      ...options,
-      symbol,
-    });
+  // Sync dengan detak jantung pasar (Urutan 4)
+  const poll = async () => {
+    const res = await fetchMarketData({ ...options, symbol });
+    if (res.data.length > 0) callback(res.data);
+  };
 
-    if (response.success || response.data.length > 0) {
-      callback(response.data);
-    }
-  }, 3000 + Math.random() * 2000);
+  poll(); // Initial call
+  const interval = setInterval(poll, 3000 + Math.random() * 1000);
 
-  // Return unsubscribe function
   return () => clearInterval(interval);
 }
 
 /* ============================================================
-   DATA CONVERSION HELPERS
+    DATA NORMALIZATION
 ============================================================ */
-
-/**
- * Convert raw API data to typed MarketPoint[]
- */
 export function convertRawToMarketPoints(rawData: any[]): MarketPoint[] {
   if (!Array.isArray(rawData)) return [];
-
   return rawData
-    .map((item) => {
-      try {
-        return {
-          timestamp: item.time || item.timestamp || item.t || Date.now(),
-          price: item.price || item.close || item.c || 0,
-          volume: item.volume || item.v || 0,
-          open: item.open || item.o,
-          high: item.high || item.h,
-          low: item.low || item.l,
-          close: item.close || item.c,
-        } as MarketPoint;
-      } catch {
-        return null;
-      }
-    })
-    .filter((point): point is MarketPoint => point !== null && point.price > 0);
+    .map((item) => ({
+      timestamp: Number(item.t || item[0] || Date.now()),
+      price: Number(item.c || item[4] || 0),
+      volume: Number(item.v || item[5] || 0),
+      open: Number(item.o || item[1]),
+      high: Number(item.h || item[2]),
+      low: Number(item.l || item[3]),
+      close: Number(item.c || item[4]),
+    }))
+    .filter(p => p.price > 0)
+    .sort((a, b) => a.timestamp - b.timestamp);
 }
 
-/**
- * Normalize market data to consistent format
- */
-export function normalizeMarketData(data: MarketPoint[]): MarketPoint[] {
-  return data
-    .sort((a, b) => a.timestamp - b.timestamp)
-    .filter((point, idx, arr) => {
-      // Remove duplicates and ensure prices are reasonable
-      const isDuplicate = idx > 0 && arr[idx - 1].timestamp === point.timestamp;
-      const isValidPrice = point.price > 0 && point.price < 10000000;
-      return !isDuplicate && isValidPrice;
-    });
-}
-
-/* ============================================================
-   BATCH OPERATIONS
-============================================================ */
-
-/**
- * Clear market data cache
- */
-export function clearMarketCache(): void {
-  marketDataCache.clear();
-}
-
-/**
- * Clear specific symbol from cache
- */
-export function clearSymbolCache(symbol: string): void {
-  const keys = Array.from(marketDataCache.keys()).filter((key) =>
-    key.startsWith(symbol)
-  );
-  keys.forEach((key) => marketDataCache.delete(key));
-}
-
-/**
- * Get cache statistics
- */
-export function getMarketCacheStats() {
-  return {
-    size: marketDataCache.size,
-    entries: Array.from(marketDataCache.keys()),
-    totalMemory: `${(marketDataCache.size * 10).toFixed(2)}KB`,
-  };
-}
+export function clearMarketCache() { marketDataCache.clear(); }

@@ -1,0 +1,1083 @@
+{
+  "version": "1.0",
+  "nodes": [
+    {
+      "name": "FEATURE_LOCK_INDEX.md",
+      "path": "FEATURE_LOCK_INDEX.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "tsconfig.tsbuildinfo",
+      "path": "tsconfig.tsbuildinfo",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "OMEGA_AI_CARD_RELEASE.md",
+      "path": "OMEGA_AI_CARD_RELEASE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "components",
+      "path": "components",
+      "is_directory": true,
+      "selected": true,
+      "expanded": false,
+      "children": [
+        {
+          "name": "HeroStats.tsx",
+          "path": "components\\HeroStats.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "Footer.tsx",
+          "path": "components\\Footer.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "MarketChartPanel.dynamic.tsx",
+          "path": "components\\MarketChartPanel.dynamic.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "TrustBar.tsx",
+          "path": "components\\TrustBar.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "MarketChartPanel.tsx",
+          "path": "components\\MarketChartPanel.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "ErrorBoundary.tsx",
+          "path": "components\\ErrorBoundary.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "LiveProfitTable.dynamic.tsx",
+          "path": "components\\LiveProfitTable.dynamic.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "ExecutionGate.tsx",
+          "path": "components\\ExecutionGate.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "HeroVisual.tsx",
+          "path": "components\\HeroVisual.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "VoiceAssistant.tsx",
+          "path": "components\\VoiceAssistant.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "AITimeline.tsx",
+          "path": "components\\AITimeline.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "BehaviorAnalysis.tsx",
+          "path": "components\\BehaviorAnalysis.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "MarketHeatmap.tsx",
+          "path": "components\\MarketHeatmap.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "MarketTicker.tsx",
+          "path": "components\\MarketTicker.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "AISessionContext.tsx",
+          "path": "components\\AISessionContext.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "OmegaCard.dynamic.tsx",
+          "path": "components\\OmegaCard.dynamic.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "TradeSimulator.tsx",
+          "path": "components\\TradeSimulator.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "FeatureLock.tsx",
+          "path": "components\\FeatureLock.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "SessionDepthBar.tsx",
+          "path": "components\\SessionDepthBar.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "GovernancePanel.tsx",
+          "path": "components\\GovernancePanel.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "Tooltip.tsx",
+          "path": "components\\Tooltip.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "StatItem.tsx",
+          "path": "components\\StatItem.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "OmegaCardSkeleton.tsx",
+          "path": "components\\OmegaCardSkeleton.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "SocialSharing.tsx",
+          "path": "components\\SocialSharing.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "Gamification.tsx",
+          "path": "components\\Gamification.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "SystemStatus.tsx",
+          "path": "components\\SystemStatus.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "ProfitTableSkeleton.tsx",
+          "path": "components\\ProfitTableSkeleton.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "LiveProfitTable.tsx",
+          "path": "components\\LiveProfitTable.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "TradeHero.tsx",
+          "path": "components\\TradeHero.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "SearchBar.tsx",
+          "path": "components\\SearchBar.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "FilterBar.tsx",
+          "path": "components\\FilterBar.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "OmegaCard.tsx",
+          "path": "components\\OmegaCard.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "CopilotHomepage.tsx",
+          "path": "components\\CopilotHomepage.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        }
+      ]
+    },
+    {
+      "name": "COPILOT_HOMEPAGE_READY.md",
+      "path": "COPILOT_HOMEPAGE_READY.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "COPILOT_HOMEPAGE_INTEGRATION.md",
+      "path": "COPILOT_HOMEPAGE_INTEGRATION.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "COPILOT_HOMEPAGE_DESIGN.md",
+      "path": "COPILOT_HOMEPAGE_DESIGN.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": ".gitignore",
+      "path": ".gitignore",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "COPILOT_EXTRA_FEATURES.md",
+      "path": "COPILOT_EXTRA_FEATURES.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "COPILOT_HOMEPAGE_GUIDE.md",
+      "path": "COPILOT_HOMEPAGE_GUIDE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "public",
+      "path": "public",
+      "is_directory": true,
+      "selected": true,
+      "expanded": false,
+      "children": [
+        {
+          "name": "images",
+          "path": "public\\images",
+          "is_directory": true,
+          "selected": true,
+          "expanded": false,
+          "children": [
+            {
+              "name": ".gitkeep",
+              "path": "public\\images\\.gitkeep",
+              "is_directory": false,
+              "selected": true,
+              "expanded": false,
+              "children": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DRAG_DROP_IMPLEMENTATION.md",
+      "path": "DRAG_DROP_IMPLEMENTATION.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "context",
+      "path": "context",
+      "is_directory": true,
+      "selected": true,
+      "expanded": false,
+      "children": [
+        {
+          "name": "UserAccessContext.tsx",
+          "path": "context\\UserAccessContext.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        }
+      ]
+    },
+    {
+      "name": "DRAG_DROP_GUIDE.md",
+      "path": "DRAG_DROP_GUIDE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "TAILWINDCSS_REFERENCE.md",
+      "path": "TAILWINDCSS_REFERENCE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "app",
+      "path": "app",
+      "is_directory": true,
+      "selected": true,
+      "expanded": false,
+      "children": [
+        {
+          "name": "page.tsx",
+          "path": "app\\page.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "layout.tsx",
+          "path": "app\\layout.tsx",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "trade",
+          "path": "app\\trade",
+          "is_directory": true,
+          "selected": true,
+          "expanded": false,
+          "children": [
+            {
+              "name": "page.tsx",
+              "path": "app\\trade\\page.tsx",
+              "is_directory": false,
+              "selected": true,
+              "expanded": false,
+              "children": null
+            },
+            {
+              "name": "loading.tsx",
+              "path": "app\\trade\\loading.tsx",
+              "is_directory": false,
+              "selected": true,
+              "expanded": false,
+              "children": null
+            },
+            {
+              "name": "components",
+              "path": "app\\trade\\components",
+              "is_directory": true,
+              "selected": true,
+              "expanded": false,
+              "children": [
+                {
+                  "name": "HeroSection.tsx",
+                  "path": "app\\trade\\components\\HeroSection.tsx",
+                  "is_directory": false,
+                  "selected": true,
+                  "expanded": false,
+                  "children": null
+                },
+                {
+                  "name": "TradeDashboard.tsx",
+                  "path": "app\\trade\\components\\TradeDashboard.tsx",
+                  "is_directory": false,
+                  "selected": true,
+                  "expanded": false,
+                  "children": null
+                },
+                {
+                  "name": "OmegaCardWrapper.tsx",
+                  "path": "app\\trade\\components\\OmegaCardWrapper.tsx",
+                  "is_directory": false,
+                  "selected": true,
+                  "expanded": false,
+                  "children": null
+                },
+                {
+                  "name": "SystemStatusPanel.tsx",
+                  "path": "app\\trade\\components\\SystemStatusPanel.tsx",
+                  "is_directory": false,
+                  "selected": true,
+                  "expanded": false,
+                  "children": null
+                },
+                {
+                  "name": "Sparkline.tsx",
+                  "path": "app\\trade\\components\\Sparkline.tsx",
+                  "is_directory": false,
+                  "selected": true,
+                  "expanded": false,
+                  "children": null
+                },
+                {
+                  "name": "LiveProfitTableWrapper.tsx",
+                  "path": "app\\trade\\components\\LiveProfitTableWrapper.tsx",
+                  "is_directory": false,
+                  "selected": true,
+                  "expanded": false,
+                  "children": null
+                },
+                {
+                  "name": "TrendCalculator.ts",
+                  "path": "app\\trade\\components\\TrendCalculator.ts",
+                  "is_directory": false,
+                  "selected": true,
+                  "expanded": false,
+                  "children": null
+                }
+              ]
+            },
+            {
+              "name": "hooks",
+              "path": "app\\trade\\hooks",
+              "is_directory": true,
+              "selected": true,
+              "expanded": false,
+              "children": [
+                {
+                  "name": "useTradeState.ts",
+                  "path": "app\\trade\\hooks\\useTradeState.ts",
+                  "is_directory": false,
+                  "selected": true,
+                  "expanded": false,
+                  "children": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "globals.css",
+          "path": "app\\globals.css",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "api",
+          "path": "app\\api",
+          "is_directory": true,
+          "selected": true,
+          "expanded": false,
+          "children": [
+            {
+              "name": "strategies",
+              "path": "app\\api\\strategies",
+              "is_directory": true,
+              "selected": true,
+              "expanded": false,
+              "children": [
+                {
+                  "name": "route.ts",
+                  "path": "app\\api\\strategies\\route.ts",
+                  "is_directory": false,
+                  "selected": true,
+                  "expanded": false,
+                  "children": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MARKET_CHART_GUIDE.md",
+      "path": "MARKET_CHART_GUIDE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "postcss.config.js",
+      "path": "postcss.config.js",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "tailwind.config.js",
+      "path": "tailwind.config.js",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "tsconfig.json",
+      "path": "tsconfig.json",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "COMPLETION_SUMMARY.md",
+      "path": "COMPLETION_SUMMARY.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": ".stylelintrc.json",
+      "path": ".stylelintrc.json",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "REFACTOR_PLAN.md",
+      "path": "REFACTOR_PLAN.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "package.json",
+      "path": "package.json",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "styles",
+      "path": "styles",
+      "is_directory": true,
+      "selected": true,
+      "expanded": false,
+      "children": [
+        {
+          "name": "variables.css",
+          "path": "styles\\variables.css",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "README.md",
+          "path": "styles\\README.md",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        }
+      ]
+    },
+    {
+      "name": "COPILOT_IMPLEMENTATION_COMPLETE.md",
+      "path": "COPILOT_IMPLEMENTATION_COMPLETE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "lib",
+      "path": "lib",
+      "is_directory": true,
+      "selected": true,
+      "expanded": false,
+      "children": [
+        {
+          "name": "types.ts",
+          "path": "lib\\types.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "marketDummy.ts",
+          "path": "lib\\marketDummy.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "scheduler.ts",
+          "path": "lib\\scheduler.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "contextTypes.ts",
+          "path": "lib\\contextTypes.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "index.ts",
+          "path": "lib\\index.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "seededRandom.ts",
+          "path": "lib\\seededRandom.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "events.ts",
+          "path": "lib\\events.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "membership.ts",
+          "path": "lib\\membership.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "featureStateManager.ts",
+          "path": "lib\\featureStateManager.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "market.ts",
+          "path": "lib\\market.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "componentTypes.ts",
+          "path": "lib\\componentTypes.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "share.ts",
+          "path": "lib\\share.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "premium.ts",
+          "path": "lib\\premium.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "insight.ts",
+          "path": "lib\\insight.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "utils",
+          "path": "lib\\utils",
+          "is_directory": true,
+          "selected": true,
+          "expanded": false,
+          "children": [
+            {
+              "name": "storage.ts",
+              "path": "lib\\utils\\storage.ts",
+              "is_directory": false,
+              "selected": true,
+              "expanded": false,
+              "children": null
+            },
+            {
+              "name": "ui.ts",
+              "path": "lib\\utils\\ui.ts",
+              "is_directory": false,
+              "selected": true,
+              "expanded": false,
+              "children": null
+            },
+            {
+              "name": "animations.ts",
+              "path": "lib\\utils\\animations.ts",
+              "is_directory": false,
+              "selected": true,
+              "expanded": false,
+              "children": null
+            }
+          ]
+        },
+        {
+          "name": "marketDataFetcher.ts",
+          "path": "lib\\marketDataFetcher.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "marketAnalysisDynamic.ts",
+          "path": "lib\\marketAnalysisDynamic.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "README.md",
+          "path": "lib\\README.md",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "MARKET_DATA_README.md",
+          "path": "lib\\MARKET_DATA_README.md",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "aiPredictions.ts",
+          "path": "lib\\aiPredictions.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "brokers.ts",
+          "path": "lib\\brokers.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        },
+        {
+          "name": "marketData.ts",
+          "path": "lib\\marketData.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        }
+      ]
+    },
+    {
+      "name": "FEATURE_LOCK_IMPLEMENTATION.md",
+      "path": "FEATURE_LOCK_IMPLEMENTATION.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "FEATURE_LOCK_QUICK_REFERENCE.md",
+      "path": "FEATURE_LOCK_QUICK_REFERENCE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "hooks",
+      "path": "hooks",
+      "is_directory": true,
+      "selected": true,
+      "expanded": false,
+      "children": [
+        {
+          "name": "useEventScheduler.ts",
+          "path": "hooks\\useEventScheduler.ts",
+          "is_directory": false,
+          "selected": true,
+          "expanded": false,
+          "children": null
+        }
+      ]
+    },
+    {
+      "name": "COPILOT_STYLING_GUIDE.md",
+      "path": "COPILOT_STYLING_GUIDE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "OMEGA_CARD_COMPLETION.md",
+      "path": "OMEGA_CARD_COMPLETION.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "FEATURE_LOCK_UX_GUIDE.md",
+      "path": "FEATURE_LOCK_UX_GUIDE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "OMEGA_AI_CARD_GUIDE.md",
+      "path": "OMEGA_AI_CARD_GUIDE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "MARKET_CHART_RELEASE.md",
+      "path": "MARKET_CHART_RELEASE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "PROJECT_SUMMARY.md",
+      "path": "PROJECT_SUMMARY.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "NEXTJS_GUIDE.md",
+      "path": "NEXTJS_GUIDE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "COPILOT_HOMEPAGE_INDEX.md",
+      "path": "COPILOT_HOMEPAGE_INDEX.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "COMPLETION_DASHBOARD.md",
+      "path": "COMPLETION_DASHBOARD.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "COPILOT_STYLING_BREAKDOWN.md",
+      "path": "COPILOT_STYLING_BREAKDOWN.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "FEATURE_LOCK_VISUAL_SUMMARY.md",
+      "path": "FEATURE_LOCK_VISUAL_SUMMARY.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "COPILOT_HOMEPAGE_COMPLETION.md",
+      "path": "COPILOT_HOMEPAGE_COMPLETION.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "COPILOT_MARKET_DATA_INTEGRATION.md",
+      "path": "COPILOT_MARKET_DATA_INTEGRATION.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "next-env.d.ts",
+      "path": "next-env.d.ts",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "RELEASE_NOTES_DRAG_DROP.md",
+      "path": "RELEASE_NOTES_DRAG_DROP.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "METADATA_GUIDE.md",
+      "path": "METADATA_GUIDE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "FEATURES_QUICK_REFERENCE.md",
+      "path": "FEATURES_QUICK_REFERENCE.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "FEATURE_LOCK_FINAL_SUMMARY.md",
+      "path": "FEATURE_LOCK_FINAL_SUMMARY.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "FEATURE_LOCK_COMPLETION_REPORT.md",
+      "path": "FEATURE_LOCK_COMPLETION_REPORT.md",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    },
+    {
+      "name": "next.config.js",
+      "path": "next.config.js",
+      "is_directory": false,
+      "selected": true,
+      "expanded": false,
+      "children": null
+    }
+  ]
+}

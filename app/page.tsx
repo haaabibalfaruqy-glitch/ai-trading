@@ -1,22 +1,23 @@
+// app/page.tsx
 "use client";
 
-import dynamicImport from "next/dynamic";
+import dynamic from "next/dynamic";
+import React from "react";
 
-export const dynamic = "force-dynamic";
+// Dynamic import agar homepage lebih ringan
+const CopilotHomepage = dynamic(
+  () => import("@/app/Shared/CopilotHomepage"),
+  { ssr: false } // hanya render di client
+);
 
-// Lazy load the Copilot Homepage for better performance
-const CopilotHomepage = dynamicImport(() => import("@/components/CopilotHomepage"), {
-  loading: () => (
-    <div className="w-full h-screen bg-gradient-to-b from-[#0A0F1C] via-[#0B1220] to-[#070B14] flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-8 h-8 border-2 border-[#22ff88]/30 border-t-[#22ff88] rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-400">Loading AI Copilot...</p>
-      </div>
-    </div>
-  ),
-  ssr: true,
-});
-
+/**
+ * Homepage utama
+ * Menampilkan teaser AI trading melalui CopilotHomepage
+ */
 export default function HomePage() {
-  return <CopilotHomepage />;
+  return (
+    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-start transition-all duration-500">
+      <CopilotHomepage />
+    </main>
+  );
 }

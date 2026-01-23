@@ -1,10 +1,19 @@
+// C:\ai_trading\context\UserAccessContext.tsx
+
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+  useCallback,
+  useMemo,
+} from "react";
 
-/* ============================================================
-   ACCESS CONTROL TYPES
-============================================================ */
+/* ================= TYPES ================= */
+
 export type AccessState = "guest" | "broker_connected" | "premium";
 
 export interface UserAccess {
@@ -19,87 +28,99 @@ export interface AccessContextType {
   unlockBroker: () => void;
   setPremiumAccess: (expiresAt?: number) => void;
   resetAccess: () => void;
+  isAuthenticated: boolean;
+  isPremium: boolean;
+  isBrokerUnlocked: boolean;
+  isLoading: boolean; // Tambahan untuk handle loading state
 }
 
-export interface AccessProviderProps {
-  children: ReactNode;
-}
+/* ================= CONSTANTS ================= */
 
-/* ============================================================
-   CONTEXT CREATION
-============================================================ */
+const STORAGE_KEY = "ai_trading_access_vault"; // Key unik agar tidak bentrok
+
 const AccessContext = createContext<AccessContextType | null>(null);
 
-/* ============================================================
-   ACCESS PROVIDER
-============================================================ */
-export function AccessProvider({ children }: AccessProviderProps) {
+/* ================= PROVIDER ================= */
+
+export function AccessProvider({ children }: { children: ReactNode }) {
   const [access, setAccess] = useState<AccessState>("guest");
   const [userAccess, setUserAccess] = useState<UserAccess | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("access_state");
-    const savedAccess = localStorage.getItem("user_access");
-
-    if (saved === "broker_connected" || saved === "premium") {
-      setAccess(saved as AccessState);
-    }
-
-    if (savedAccess) {
-      try {
-        setUserAccess(JSON.parse(savedAccess));
-      } catch (err) {
-        console.warn("[Access] Failed to parse stored access:", err);
-      }
-    }
-  }, []);
-
-  // Unlock broker connection
-  const unlockBroker = () => {
-    const newAccess: UserAccess = {
-      state: "broker_connected",
-      connectedAt: Date.now(),
-    };
-
-    localStorage.setItem("access_state", "broker_connected");
-    localStorage.setItem("user_access", JSON.stringify(newAccess));
-
-    setAccess("broker_connected");
-    setUserAccess(newAccess);
-  };
-
-  // Set premium access with optional expiration
-  const setPremiumAccess = (expiresAt?: number) => {
-    const newAccess: UserAccess = {
-      state: "premium",
-      connectedAt: Date.now(),
-      expiresAt,
-    };
-
-    localStorage.setItem("access_state", "premium");
-    localStorage.setItem("user_access", JSON.stringify(newAccess));
-
-    setAccess("premium");
-    setUserAccess(newAccess);
-  };
-
-  // Reset access to guest
-  const resetAccess = () => {
-    localStorage.removeItem("access_state");
-    localStorage.removeItem("user_access");
-
+  // Fungsi Reset (dibuat hoisting agar bisa dipanggil di useEffect)
+  const resetAccess = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
     setAccess("guest");
     setUserAccess(null);
-  };
+  }, []);
 
-  const value: AccessContextType = {
+  /* ===== LOAD & SYNC DATA ===== */
+  useEffect(() => {
+    const syncAccess = () => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed: UserAccess = JSON.parse(saved);
+
+          // Cek Expiry
+          if (parsed.expiresAt && Date.now() > parsed.expiresAt) {
+            resetAccess();
+          } else {
+            setAccess(parsed.state);
+            setUserAccess(parsed);
+          }
+        }
+      } catch (err) {
+        console.error("[Access] Sync Error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Jalankan saat pertama load
+    syncAccess();
+
+    // Listener untuk sinkronisasi antar TAB browser
+    window.addEventListener("storage", syncAccess);
+    return () => window.removeEventListener("storage", syncAccess);
+  }, [resetAccess]);
+
+  /* ===== ACTIONS ===== */
+
+  const updateAccess = useCallback((newAccess: UserAccess) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newAccess));
+    setAccess(newAccess.state);
+    setUserAccess(newAccess);
+  }, []);
+
+  const unlockBroker = useCallback(() => {
+    updateAccess({
+      state: "broker_connected",
+      connectedAt: Date.now(),
+    });
+  }, [updateAccess]);
+
+  const setPremiumAccess = useCallback((expiresAt?: number) => {
+    updateAccess({
+      state: "premium",
+      connectedAt: Date.now(),
+      expiresAt: expiresAt || Date.now() + 30 * 24 * 60 * 60 * 1000, // Default 30 hari
+    });
+  }, [updateAccess]);
+
+  /* ===== DERIVED VALUES ===== */
+  // useMemo memastikan komponen tidak re-render kecuali data ini berubah
+  const value = useMemo(() => ({
     access,
     userAccess,
     unlockBroker,
     setPremiumAccess,
     resetAccess,
-  };
+    isAuthenticated: access !== "guest",
+    isPremium: access === "premium",
+    isBrokerUnlocked: access === "broker_connected" || access === "premium",
+    isLoading,
+  }), [access, userAccess, unlockBroker, setPremiumAccess, resetAccess, isLoading]);
 
   return (
     <AccessContext.Provider value={value}>
@@ -108,31 +129,10 @@ export function AccessProvider({ children }: AccessProviderProps) {
   );
 }
 
-/* ============================================================
-   ACCESS HOOK
-============================================================ */
-export function useAccess(): AccessContextType {
+/* ================= HOOKS ================= */
+
+export function useAccess() {
   const ctx = useContext(AccessContext);
-
-  if (!ctx) {
-    throw new Error(
-      "[useAccess] Hook must be used inside AccessProvider. " +
-      "Ensure AccessProvider wraps your component tree in layout.tsx"
-    );
-  }
-
+  if (!ctx) throw new Error("useAccess must be used within AccessProvider");
   return ctx;
-}
-
-/* ============================================================
-   ACCESS UTILITIES
-============================================================ */
-export function useIsAuthenticated(): boolean {
-  const { access } = useAccess();
-  return access !== "guest";
-}
-
-export function useIsPremium(): boolean {
-  const { access } = useAccess();
-  return access === "premium";
 }

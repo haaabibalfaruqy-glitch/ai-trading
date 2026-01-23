@@ -1,258 +1,155 @@
-/**
- * Dynamic Market Analysis Module
- * Heavy computations with lazy loading and dynamic imports
- */
+// C:\ai_trading\lib\marketAnalysisDynamic.ts
 
-import dynamic from "next/dynamic";
 import { MarketPoint } from "@/lib/types";
 import { AccessState } from "@/context/UserAccessContext";
 
 /* ============================================================
-   LAZY-LOADED ANALYSIS COMPONENTS
+    TYPES
 ============================================================ */
-
-/**
- * Dynamically import market analysis functions
- * This reduces initial bundle size by deferring heavy computation imports
- */
-export const loadMarketAnalysis = () => {
-  return import("@/lib/aiPredictions").then((module) => ({
-    generateAIPredictions: module.generateAIPredictions,
-    generateAIInsights: module.generateAIInsights,
-    analyzeMarket: module.analyzeMarket,
-    calculateVolatility: module.calculateVolatility,
-    calculateRSI: module.calculateRSI,
-    calculateMACD: module.calculateMACD,
-  }));
-};
-
-export const loadMarketDataFetcher = () => {
-  return import("@/lib/marketDataFetcher").then((module) => ({
-    fetchMarketData: module.fetchMarketData,
-    fetchMultipleMarketData: module.fetchMultipleMarketData,
-    subscribeToMarketData: module.subscribeToMarketData,
-    convertRawToMarketPoints: module.convertRawToMarketPoints,
-  }));
-};
-
-/* ============================================================
-   LAZY-LOADED INSIGHTS GENERATOR
-============================================================ */
-
 export interface InsightsLoaderOptions {
   symbol: string;
   access?: AccessState;
   onProgress?: (status: string) => void;
+  signal?: AbortSignal; // Tambahan untuk penghentian proses
 }
 
-/**
- * Load and generate comprehensive market insights
- * Handles access control and lazy loading
- */
+export interface InsightsResult {
+  trend: string;
+  signal: string;
+  analysis: any;
+  prediction?: any;
+  locked: boolean;
+  timestamp: number;
+}
+
+/* ============================================================
+    DYNAMIC LOADERS (Optimized with Caching)
+============================================================ */
+let analysisModuleCache: any = null;
+
+export const loadMarketAnalysis = async () => {
+  if (analysisModuleCache) return analysisModuleCache;
+  const module = await import("@/lib/aiPredictions");
+  analysisModuleCache = {
+    generateAIPredictions: module.generateAIPredictions,
+    generateAIInsights: module.generateAIInsights,
+    analyzeMarket: module.analyzeMarket,
+  };
+  return analysisModuleCache;
+};
+
+export const loadMarketDataFetcher = async () => {
+  const module = await import("@/lib/marketDataFetcher");
+  return module;
+};
+
+/* ============================================================
+    INSIGHTS GENERATOR (Secure & Synchronized)
+============================================================ */
 export async function loadAndGenerateInsights(
   points: MarketPoint[],
   options: InsightsLoaderOptions
-) {
-  const { access = "guest", onProgress } = options;
-  const locked = access === "guest";
+): Promise<InsightsResult> {
+  const { access = "guest", onProgress, signal } = options;
+  const isPremium = access === "premium";
 
   try {
-    onProgress?.("Loading analysis engine...");
+    if (signal?.aborted) throw new Error("Analysis aborted");
 
-    // Dynamically load prediction module
-    const predictions = await loadMarketAnalysis();
+    onProgress?.("Syncing Neural Engine...");
+    const engine = await loadMarketAnalysis();
 
-    onProgress?.("Analyzing market data...");
+    if (signal?.aborted) throw new Error("Analysis aborted");
+    
+    onProgress?.("Calculating Market Vectors...");
+    const insights = engine.generateAIInsights(points);
 
-    // Generate predictions
-    const insights = predictions.generateAIInsights(points);
-
-    // For locked users, reduce detail level
-    if (locked) {
+    // SINKRONISASI KEAMANAN: Jika bukan premium, sembunyikan data sensitif
+    if (!isPremium) {
       return {
         ...insights,
         analysis: {
           ...insights.analysis,
-          rsi: undefined, // Hide advanced indicators
-          macd: undefined,
+          rsi: 50, // Data palsu untuk guest
+          macd: { value: 0, signal: 0, histogram: 0 },
+          supportLevel: "Locked",
+          resistanceLevel: "Locked"
         },
         locked: true,
+        timestamp: Date.now(),
       };
     }
 
-    onProgress?.("Analysis complete");
-    return {
-      ...insights,
-      locked: false,
-    };
-  } catch (error) {
-    console.error("Error generating insights:", error);
-    throw new Error("Failed to generate market insights");
+    onProgress?.("Intelligence Ready");
+    return { ...insights, locked: false, timestamp: Date.now() };
+  } catch (err) {
+    console.error("[Neural-Orchestrator] Error:", err);
+    throw err;
   }
 }
 
 /* ============================================================
-   PERFORMANCE OPTIMIZATION HELPERS
+    SMART CACHE SYSTEM
 ============================================================ */
+const analysisCache = new Map<string, { result: InsightsResult; timestamp: number }>();
+const CACHE_TTL = 30_000; // Dikurangi ke 30 detik agar tetap "Real-Time"
 
-/**
- * Batch process multiple symbols with rate limiting
- */
-export async function batchAnalyzeSymbols(
-  symbols: string[],
-  onAnalyze: (symbol: string, result: any) => void,
-  options?: InsightsLoaderOptions & { concurrency?: number }
-) {
-  const concurrency = options?.concurrency || 3;
-  const fetcher = await loadMarketDataFetcher();
-
-  const queue = [...symbols];
-  const processing = new Set<string>();
-
-  return new Promise<void>((resolve, reject) => {
-    const processNext = async () => {
-      if (queue.length === 0 && processing.size === 0) {
-        resolve();
-        return;
-      }
-
-      while (processing.size < concurrency && queue.length > 0) {
-        const symbol = queue.shift()!;
-        processing.add(symbol);
-
-        try {
-          options?.onProgress?.(`Fetching ${symbol}...`);
-
-          const data = await fetcher.fetchMarketData({
-            symbol,
-            access: options?.access || "guest",
-          });
-
-          if (data.data.length > 0) {
-            const insights = await loadAndGenerateInsights(data.data, {
-              ...options,
-              symbol,
-            });
-
-            onAnalyze(symbol, insights);
-          }
-        } catch (error) {
-          console.error(`Failed to analyze ${symbol}:`, error);
-        } finally {
-          processing.delete(symbol);
-          processNext();
-        }
-      }
-    };
-
-    processNext();
-  });
-}
-
-/* ============================================================
-   MEMOIZATION & CACHING
-============================================================ */
-
-const analysisCache = new Map<string, { result: any; timestamp: number }>();
-const ANALYSIS_CACHE_TTL = 300000; // 5 minutes
-
-/**
- * Cached analysis with TTL
- */
 export async function cachedAnalyzeSymbol(
   points: MarketPoint[],
   symbol: string,
   options?: InsightsLoaderOptions
-) {
-  const cacheKey = `${symbol}:${points.length}`;
-  const cached = analysisCache.get(cacheKey);
+): Promise<InsightsResult> {
+  const key = `${symbol}:${points.length}`;
+  const cached = analysisCache.get(key);
 
-  if (cached && Date.now() - cached.timestamp < ANALYSIS_CACHE_TTL) {
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
     return cached.result;
   }
 
-  const result = await loadAndGenerateInsights(points, {
-    ...options,
-    symbol,
-  });
-
-  analysisCache.set(cacheKey, { result, timestamp: Date.now() });
+  const result = await loadAndGenerateInsights(points, { ...options, symbol });
+  analysisCache.set(key, { result, timestamp: Date.now() });
   return result;
 }
 
-/**
- * Clear analysis cache
- */
+/* ============================================================
+    BATCH CONCURRENCY (Premium Trading Desk Style)
+============================================================ */
+export async function batchAnalyzeSymbols(
+  symbols: string[],
+  onAnalyze: (symbol: string, result: InsightsResult) => void,
+  options?: InsightsLoaderOptions & { concurrency?: number }
+): Promise<void> {
+  const concurrency = options?.concurrency || 2;
+  const queue = [...symbols];
+  const activeTasks: Promise<void>[] = [];
+
+  const runTask = async (symbol: string) => {
+    try {
+      const fetcher = await loadMarketDataFetcher();
+      const data = await fetcher.fetchMarketData({ symbol, access: options?.access || "guest" });
+      
+      if (data.data) {
+        const result = await cachedAnalyzeSymbol(data.data, symbol, options);
+        onAnalyze(symbol, result);
+      }
+    } catch (e) {
+      console.warn(`Skipping ${symbol} due to error`);
+    }
+  };
+
+  while (queue.length > 0) {
+    while (activeTasks.length < concurrency && queue.length > 0) {
+      const symbol = queue.shift()!;
+      const task = runTask(symbol).then(() => {
+        activeTasks.splice(activeTasks.indexOf(task), 1);
+      });
+      activeTasks.push(task);
+    }
+    await Promise.race(activeTasks);
+  }
+  await Promise.all(activeTasks);
+}
+
 export function clearAnalysisCache() {
   analysisCache.clear();
-}
-
-/* ============================================================
-   STREAM PROCESSING
-============================================================ */
-
-/**
- * Process market data stream with analysis
- * Returns async generator for memory efficiency
- */
-export async function* analyzeMarketStream(
-  symbols: string[],
-  options?: InsightsLoaderOptions & { batchSize?: number }
-) {
-  const batchSize = options?.batchSize || 1;
-  const fetcher = await loadMarketDataFetcher();
-
-  for (let i = 0; i < symbols.length; i += batchSize) {
-    const batch = symbols.slice(i, i + batchSize);
-
-    for (const symbol of batch) {
-      try {
-        const data = await fetcher.fetchMarketData({
-          symbol,
-          access: options?.access || "guest",
-        });
-
-        if (data.data.length > 0) {
-          const insights = await loadAndGenerateInsights(data.data, {
-            ...options,
-            symbol,
-          });
-
-          yield {
-            symbol,
-            insights,
-            success: true,
-          };
-        }
-      } catch (error) {
-        yield {
-          symbol,
-          error: String(error),
-          success: false,
-        };
-      }
-    }
-  }
-}
-
-/* ============================================================
-   WORKER-FRIENDLY ANALYSIS
-============================================================ */
-
-/**
- * Get analysis configuration for potential Worker implementation
- */
-export function getWorkerAnalysisConfig() {
-  return {
-    supportedAnalysis: [
-      "generateAIPredictions",
-      "analyzeMarket",
-      "calculateVolatility",
-      "calculateRSI",
-      "calculateMACD",
-    ],
-    cacheable: true,
-    cacheSize: analysisCache.size,
-    heavyComputations: true,
-  };
 }

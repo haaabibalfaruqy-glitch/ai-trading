@@ -1,192 +1,68 @@
-/**
- * Events & Funnel Tracking System
- * Type-safe event handling with state synchronization
- */
+// C:\ai_trading\lib\events.ts
 
 import { featureStateManager } from "./featureStateManager";
 
 /* ============================================================
-   TYPES & INTERFACES
+    TYPES & ENUMERATIONS (Synchronized with All Groups)
 ============================================================ */
-
 export type EventType =
-  // STEP 1–2
-  | "page_view"
-  | "cta_click"
-  | "cta_click_hero"
-  | "cta_click_final"
-  | "module_view"
-  | "homepage_viewed"
-  | "feature_explorer_opened"
-  // EXIT / TRUST
-  | "exit_intent"
-  | "exit_recover"
-  | "exit_dismiss"
-  | "trust_pulse"
-  // STEP 3
-  | "execution_gate_view"
-  | "execution_gate_click"
-  | "execution_unlocked"
-  | "execution_blocked"
-  | "premium_cta_click"
-  // STEP 4
-  | "affiliate_redirect"
-  | "return_from_broker"
-  | "premium_trial_expired"
-  | "premium_returning_user"
-  | "premium_slots_exhausted"
-  // STEP 6 — RESURRECTION
-  | "user_resurrected"
-  | "resurrection_cta_click"
-  // STEP 7 — INSIGHT / VIRAL
-  | "insight_generated"
-  | "insight_viewed"
-  | "insight_shared"
-  | "viral_insight_generated"
-  // DASHBOARD INTERACTIONS
-  | "card_reordered"
-  | "card_order_reset"
-  // FEATURE UNLOCK EVENTS
-  | "feature_unlock_requested"
-  | "feature_unlock_success"
-  | "feature_unlock_failed"
-  | "unlock_requested"
-  | "unlock_success"
-  | "unlock_failed"
-  | "lock"
-  | "expired"
-  | "feature_lock"
-  | "feature_expired";
-
+  | "page_view" | "cta_click" | "cta_click_hero" | "module_view"
+  | "execution_gate_view" | "execution_gate_click" | "execution_unlocked"
+  | "execution_blocked" | "premium_cta_click" | "feature_unlock_requested"
+  | "feature_unlock_success" | "feature_unlock_failed" | "feature_lock"
+  | "market_chart_view" | "insight_generated" | "insight_shared"
+  | "exit_intent" | "trust_pulse" | "user_resurrected";
+  
 export interface EventPayload {
   type: EventType;
   meta?: Record<string, any>;
   timestamp: number;
   sessionId: string;
-  userId?: string;
 }
 
 export interface FunnelState {
   sawChart: boolean;
   clickedSoftCTA: boolean;
   gateViewed: boolean;
-  gateClicked: boolean;
   executionUnlocked: boolean;
-  redirectedToBroker: boolean;
   featureUnlocksCount: number;
   lastEventType?: EventType;
-  lastEventTime?: number;
-}
-
-export interface EventListener {
-  (event: EventPayload): void;
 }
 
 /* ============================================================
-   STORAGE KEYS
+    STATE & SESSION (Next.js Optimized)
 ============================================================ */
-
-const FUNNEL_KEY = "ai_funnel_state";
-const SESSION_KEY = "session_id";
-const EVENT_QUEUE_KEY = "event_queue";
-
-/* ============================================================
-   SESSION MANAGEMENT
-============================================================ */
+const FUNNEL_KEY = "omega_funnel_v2";
+const SESSION_KEY = "omega_session_id";
 
 function getSessionId(): string {
-  if (typeof window === "undefined") return "";
-
-  let sessionId = sessionStorage.getItem(SESSION_KEY);
-  if (!sessionId) {
-    sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    sessionStorage.setItem(SESSION_KEY, sessionId);
+  if (typeof window === "undefined") return "ssr";
+  let id = sessionStorage.getItem(SESSION_KEY);
+  if (!id) {
+    id = `neural_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    sessionStorage.setItem(SESSION_KEY, id);
   }
-  return sessionId;
+  return id;
 }
 
 /* ============================================================
-   STORAGE FUNCTIONS
+    CORE TRACKING ENGINE
 ============================================================ */
-
-function loadFunnel(): FunnelState | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(FUNNEL_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveFunnel(state: FunnelState): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(FUNNEL_KEY, JSON.stringify(state));
-  } catch {
-    console.warn("[Events] Failed to save funnel state");
-  }
-}
-
-function loadEventQueue(): EventPayload[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = sessionStorage.getItem(EVENT_QUEUE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveEventQueue(queue: EventPayload[]): void {
-  if (typeof window === "undefined") return;
-  try {
-    // Only keep last 100 events
-    const limited = queue.slice(-100);
-    sessionStorage.setItem(EVENT_QUEUE_KEY, JSON.stringify(limited));
-  } catch {
-    console.warn("[Events] Failed to save event queue");
-  }
-}
-
-/* ============================================================
-   GLOBAL STATE
-============================================================ */
-
 let funnelState: FunnelState = {
   sawChart: false,
   clickedSoftCTA: false,
   gateViewed: false,
-  gateClicked: false,
   executionUnlocked: false,
-  redirectedToBroker: false,
   featureUnlocksCount: 0,
 };
 
-const eventQueue: EventPayload[] = loadEventQueue();
-const funnelListeners = new Set<EventListener>();
-const eventListeners = new Set<EventListener>();
-
-/* ============================================================
-   EVENT TRACKING (TYPE-SAFE)
-============================================================ */
+const eventListeners = new Set<(ev: EventPayload) => void>();
 
 /**
- * Track an event with type checking and automatic state sync
+ * Enterprise Event Tracker: 
+ * Mencatat kejadian dan mensinkronisasi state aplikasi secara global.
  */
-export function trackEvent(
-  type: EventType,
-  meta?: Record<string, any>
-): EventPayload {
-  if (typeof window === "undefined") {
-    return {
-      type,
-      meta,
-      timestamp: Date.now(),
-      sessionId: "",
-    };
-  }
-
+export function trackEvent(type: EventType, meta?: Record<string, any>): EventPayload {
   const event: EventPayload = {
     type,
     meta,
@@ -194,284 +70,70 @@ export function trackEvent(
     sessionId: getSessionId(),
   };
 
-  eventQueue.push(event);
-  saveEventQueue(eventQueue);
+  if (typeof window !== "undefined") {
+    // 1. Update Internal Funnel
+    updateFunnelLogic(type, meta);
+    
+    // 2. Local Storage Persistence
+    saveToStorage(event);
 
-  // Update funnel state
-  updateFunnel(type, meta);
+    // 3. Global Notification (Sinkronisasi UI)
+    eventListeners.forEach(listener => listener(event));
 
-  // Notify listeners
-  notifyEventListeners(event);
-
-  // Development logging
-  if (process.env.NODE_ENV === "development") {
-    console.log("[EVENT]", {
-      type,
-      meta,
-      sessionId: event.sessionId,
-    });
+    // 4. Debugging (Hanya di Dev)
+    if (process.env.NODE_ENV === "development") {
+      console.log(`%c[EVENT: ${type}]`, "color: #10b981; font-weight: bold", meta);
+    }
   }
 
   return event;
 }
 
-/**
- * Track event with feature unlock sync
- */
-export function trackFeatureEvent(
-  type: "unlock_requested" | "unlock_success" | "unlock_failed" | "lock" | "expired",
-  featureName: string,
-  meta?: Record<string, any>
-): EventPayload {
-  const eventTypeMap = {
-    unlock_requested: "feature_unlock_requested" as const,
-    unlock_success: "feature_unlock_success" as const,
-    unlock_failed: "feature_unlock_failed" as const,
-    lock: "feature_lock" as const,
-    expired: "feature_expired" as const,
-  };
-
-  return trackEvent(eventTypeMap[type], {
-    feature: featureName,
-    ...meta,
-  });
-}
-
 /* ============================================================
-   FUNNEL STATE MANAGEMENT
+    FUNNEL LOGIC (The Path to Conversion)
 ============================================================ */
-
-/**
- * Update funnel state based on event
- */
-export function updateFunnel(
-  type: EventType,
-  meta?: Record<string, any>
-): void {
-  const previousState = { ...funnelState };
-
-  // Update based on event type
-  if (type === "module_view") {
-    funnelState.sawChart = true;
-  }
-
-  if (type === "cta_click" && (meta?.tier === "soft" || meta?.tier === "hard")) {
-    funnelState.clickedSoftCTA = true;
-  }
-
-  if (type === "affiliate_redirect") {
-    funnelState.redirectedToBroker = true;
-  }
-
-  if (type === "execution_gate_view") {
-    funnelState.gateViewed = true;
-  }
-
-  if (type === "execution_gate_click") {
-    funnelState.gateClicked = true;
-  }
-
-  if (type === "execution_unlocked") {
-    funnelState.executionUnlocked = true;
-  }
-
-  if (type === "feature_unlock_success") {
-    funnelState.featureUnlocksCount++;
-  }
-
-  // Update last event tracking
+function updateFunnelLogic(type: EventType, meta?: Record<string, any>) {
   funnelState.lastEventType = type;
-  funnelState.lastEventTime = Date.now();
 
-  // Save only if changed
-  if (JSON.stringify(previousState) !== JSON.stringify(funnelState)) {
-    saveFunnel(funnelState);
-    notifyFunnelListeners();
+  switch (type) {
+    case "market_chart_view": funnelState.sawChart = true; break;
+    case "cta_click": funnelState.clickedSoftCTA = true; break;
+    case "execution_gate_view": funnelState.gateViewed = true; break;
+    case "execution_unlocked": funnelState.executionUnlocked = true; break;
+    case "feature_unlock_success": funnelState.featureUnlocksCount++; break;
   }
+
+  localStorage.setItem(FUNNEL_KEY, JSON.stringify(funnelState));
 }
 
-/**
- * Initialize funnel state from storage
- */
-export function initializeFunnelState(): void {
-  const stored = loadFunnel();
-  if (stored) {
-    funnelState = stored;
-  }
-}
-
-/**
- * Get current funnel state (copy)
- */
-export function getFunnelState(): FunnelState {
-  return { ...funnelState };
-}
-
-/**
- * Reset funnel state
- */
-export function resetFunnelState(): void {
-  funnelState = {
-    sawChart: false,
-    clickedSoftCTA: false,
-    gateViewed: false,
-    gateClicked: false,
-    executionUnlocked: false,
-    redirectedToBroker: false,
-    featureUnlocksCount: 0,
-  };
-  saveFunnel(funnelState);
-  notifyFunnelListeners();
+function saveToStorage(event: EventPayload) {
+  try {
+    const queue = JSON.parse(sessionStorage.getItem("omega_event_log") || "[]");
+    queue.push(event);
+    sessionStorage.setItem("omega_event_log", JSON.stringify(queue.slice(-50)));
+  } catch (e) { /* silent fail */ }
 }
 
 /* ============================================================
-   EVENT LISTENERS & SUBSCRIPTIONS
+    HOOKS & UTILITIES
 ============================================================ */
+export function subscribeToEvents(callback: (ev: EventPayload) => void) {
+  eventListeners.add(callback);
+  return () => eventListeners.delete(callback);
+}
 
-/**
- * Subscribe to any event
- */
-export function subscribeToEvents(listener: EventListener): () => void {
-  eventListeners.add(listener);
-  return () => eventListeners.delete(listener);
+export function getFunnelAnalytics() {
+  if (typeof window === "undefined") return funnelState;
+  const stored = localStorage.getItem(FUNNEL_KEY);
+  return stored ? JSON.parse(stored) : funnelState;
 }
 
 /**
- * Subscribe to funnel state changes
+ * Spesifik untuk integrasi dengan FeatureLock (Urutan 5)
  */
-export function subscribeFunnel(listener: EventListener): () => void {
-  funnelListeners.add(listener);
-  return () => funnelListeners.delete(listener);
-}
-
-/**
- * Notify event listeners
- */
-function notifyEventListeners(event: EventPayload): void {
-  eventListeners.forEach((listener) => {
-    try {
-      listener(event);
-    } catch (error) {
-      console.error("[Events] Listener error:", error);
-    }
+export function trackFeatureUnlock(featureId: string, success: boolean) {
+  return trackEvent(success ? "feature_unlock_success" : "feature_unlock_failed", {
+    featureId,
+    timestamp: new Date().toISOString()
   });
-}
-
-/**
- * Notify funnel listeners
- */
-function notifyFunnelListeners(): void {
-  funnelListeners.forEach((listener) => {
-    try {
-      listener({
-        type: "trust_pulse",
-        timestamp: Date.now(),
-        sessionId: getSessionId(),
-        meta: funnelState,
-      });
-    } catch (error) {
-      console.error("[Events] Funnel listener error:", error);
-    }
-  });
-}
-
-/* ============================================================
-   EVENT QUEUE & HISTORY
-============================================================ */
-
-/**
- * Get all tracked events
- */
-export function getEvents(): EventPayload[] {
-  return [...eventQueue];
-}
-
-/**
- * Get events of specific type
- */
-export function getEventsByType(type: EventType): EventPayload[] {
-  return eventQueue.filter((e) => e.type === type);
-}
-
-/**
- * Get events in time range
- */
-export function getEventsByTimeRange(
-  startTime: number,
-  endTime: number
-): EventPayload[] {
-  return eventQueue.filter(
-    (e) => e.timestamp >= startTime && e.timestamp <= endTime
-  );
-}
-
-/**
- * Clear event history
- */
-export function clearEventHistory(): void {
-  eventQueue.length = 0;
-  saveEventQueue(eventQueue);
-}
-
-/* ============================================================
-   ANALYTICS & STATISTICS
-============================================================ */
-
-/**
- * Get session statistics
- */
-export function getSessionStats() {
-  const sessionId = getSessionId();
-  const sessionEvents = eventQueue.length;
-
-  return {
-    sessionId,
-    eventCount: sessionEvents,
-    funnel: getFunnelState(),
-    startTime: eventQueue[0]?.timestamp,
-    endTime: eventQueue[eventQueue.length - 1]?.timestamp,
-    duration: eventQueue[eventQueue.length - 1]
-      ? eventQueue[eventQueue.length - 1].timestamp - (eventQueue[0]?.timestamp || 0)
-      : 0,
-  };
-}
-
-/**
- * Get event type distribution
- */
-export function getEventDistribution(): Record<EventType, number> {
-  const distribution: Record<EventType, number> = {} as any;
-
-  eventQueue.forEach((event) => {
-    distribution[event.type] = (distribution[event.type] || 0) + 1;
-  });
-
-  return distribution;
-}
-
-/* ============================================================
-   STATE SYNC WITH FEATURES
-============================================================ */
-
-/**
- * Sync event state with feature manager
- */
-export function syncFeatureStateFromEvents(): void {
-  // Count feature unlocks from events
-  const unlocks = getEventsByType("feature_unlock_success").length;
-
-  // Update funnel
-  funnelState.featureUnlocksCount = unlocks;
-  saveFunnel(funnelState);
-}
-
-/**
- * Debug: Print all events
- */
-export function debugEvents(): void {
-  console.group("[Events Debug]");
-  console.log("Session:", getSessionStats());
-  console.log("Events:", eventQueue);
-  console.log("Distribution:", getEventDistribution());
-  console.groupEnd();
 }
